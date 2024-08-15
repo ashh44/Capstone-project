@@ -12,7 +12,7 @@ import java.io.IOException
 
 @RestController
 @RequestMapping("/api/consult/{uuid}")
-class AudioController {
+class AudioController(private val audioConversionService: AudioConversionService) {
 
     private val baseDir = "audio_files/"
 
