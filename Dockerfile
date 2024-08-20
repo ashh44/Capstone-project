@@ -1,12 +1,13 @@
 FROM gradle:7.6-jdk AS build
 WORKDIR /app
 COPY src/main /app/src/main
-COPY build.gradle.kts ./
-
+COPY build.gradle.kts /app
+COPY audio_files /app/audio_files
 COPY src/main ./support/src/main
 COPY build.gradle.kts ./support
 
-COPY build.gradle.kts settings.gradle.kts  ./
+COPY build.gradle.kts  /app
+COPY settings.gradle.kts /app
 
 RUN gradle clean build
 
