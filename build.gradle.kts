@@ -5,6 +5,7 @@ plugins {
 	id("io.spring.dependency-management") version "1.1.6"
 	kotlin("plugin.jpa") version "1.9.24"
 
+
 }
 val kotlin_version = "1.8.22"
 group = "com.example"
@@ -32,6 +33,13 @@ dependencies {
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
 	testImplementation("org.springframework.security:spring-security-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+	implementation("com.squareup.okhttp3:okhttp:4.9.3")
+	implementation("org.json:json:20211205")
+	implementation("com.google.code.gson:gson:2.10.1")
+
+
+
 }
 
 kotlin {
