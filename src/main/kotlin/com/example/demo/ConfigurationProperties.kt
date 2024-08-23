@@ -6,9 +6,9 @@ import org.springframework.stereotype.Component
 // where these properties are needed.
 @Component
 class ConfigurationProperties {
-    @Value("\${api.key:default_value_if_not_set}")
-    lateinit var apiKey: String //setting value to apikey from application properties using the @value annotation
-    @Value("\${openapi.key:default_value_if_not_set}")
+    @Value("\${api.deepgramKey:}")
+    lateinit var apiKey: String 
+    @Value("\${api.openaiKey:}")
     lateinit var openapiKey: String
 
 }

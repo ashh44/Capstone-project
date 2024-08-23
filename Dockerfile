@@ -16,7 +16,6 @@ FROM openjdk:17.0.1-jdk-slim AS run
 RUN adduser --system --group app-user
 WORKDIR /app
 COPY --from=build --chown=app-user:app-user /app/build/libs/demo-0.0.1-SNAPSHOT.jar /app/app.jar
-COPY config/  /app/config
 EXPOSE 8080
 USER app-user
 
