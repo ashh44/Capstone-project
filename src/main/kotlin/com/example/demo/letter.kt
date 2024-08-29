@@ -8,7 +8,7 @@ import com.google.gson.reflect.TypeToken
 import java.io.File
 import java.io.IOException
 
-fun ClinicalMain() {
+public fun letterMain() {
     val transcriptionFilePath = "transcribed files/7087_transcription_result.txt"
     val gptApiKey = "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"
     val gptApiUrl = "https://api.openai.com/v1/chat/completions"
@@ -20,7 +20,7 @@ fun ClinicalMain() {
         return
     }
 
-    // Generate clinical notes from transcription
+    // Generate consult letter from transcription
     val client = OkHttpClient()
 
     val requestBody = Gson().toJson(
@@ -29,7 +29,15 @@ fun ClinicalMain() {
             "messages" to listOf(
                 mapOf(
                     "role" to "user",
-                    "content" to "Generate clinical notes based on the following transcription:\n\n$transcriptionText"
+                    "content" to """
+                        Using the following transcription, generate a consult letter in the format below:
+
+                        Dear [The other doctor/dr being referred to],
+                        Thank you for seeing Bowen, for opinion and management on stomach pain.
+
+                        Transcription:
+                        $transcriptionText
+                    """.trimIndent()
                 )
             ),
             "max_tokens" to 150,
@@ -59,11 +67,11 @@ fun ClinicalMain() {
             val choices = gptResponse["choices"] as? List<*>
             val choice = choices?.firstOrNull() as? Map<*, *>
             val content = (choice?.get("message") as? Map<*, *>)?.get("content") as? String
-            val clinicalNotes = content ?: "No clinical notes generated."
+            val consultLetter = content ?: "No consult letter generated."
 
-            println("Generated Clinical Notes:\n$clinicalNotes")
+            println("Generated Consult Letter:\n$consultLetter")
         }
     } catch (e: IOException) {
-        println("Error generating clinical notes: ${e.message}")
+        println("Error generating consult letter: ${e.message}")
     }
 }
