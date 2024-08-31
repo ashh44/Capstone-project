@@ -6,8 +6,9 @@ import org.springframework.stereotype.Component
 // where these properties are needed.
 @Component
 class ConfigurationProperties {
-    @Value("\${dgapi.key:default_value_if_not_set}")
-    lateinit var dgApiKey: String  //pass value from docker-compose thru @Value
-    @Value("\${openaiapi.key:default_value_if_not_set}")
-    lateinit var openaiApikey: String
+    @Value("\${api.deepgramKey:}")
+    lateinit var apiKey: String 
+    @Value("\${api.openaiKey:}")
+    lateinit var openapiKey: String
+
 }
