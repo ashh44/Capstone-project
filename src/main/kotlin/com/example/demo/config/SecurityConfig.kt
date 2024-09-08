@@ -1,18 +1,16 @@
-package com.example.demo.config
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.core.userdetails.User
-import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
-import org.springframework.security.provisioning.InMemoryUserDetailsManager
+import org.springframework.security.provisioning.JdbcUserDetailsManager
 import org.springframework.security.web.SecurityFilterChain
+import javax.sql.DataSource
 
 @Configuration
 @EnableWebSecurity
-class SecurityConfig {
+class SecurityConfig(private val dataSource: DataSource) {
 
     init {
         println("SecurityConfig is being loaded!")
@@ -20,11 +18,12 @@ class SecurityConfig {
 
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
+        println("Security filter chain is being configured")
         http
             .authorizeHttpRequests { requests ->
                 requests
                     .requestMatchers("/login").permitAll()
-                    .requestMatchers("/admin").hasRole("USER")
+                    .requestMatchers("/admin").hasRole("ADMIN")
                     .anyRequest().authenticated()
             }
             .formLogin { formLogin ->
@@ -32,18 +31,9 @@ class SecurityConfig {
                     .loginPage("/login")
                     .permitAll()
             }
+            .userDetailsService(jdbcUserDetailsManager())
 
         return http.build()
-    }
-
-    @Bean
-    fun userDetailsService(): UserDetailsService {
-        val userDetails = User.withUsername("user")
-            .password(passwordEncoder().encode("password"))
-            .roles("USER")
-            .build()
-        println("Created user: ${userDetails.username}")
-        return InMemoryUserDetailsManager(userDetails)
     }
 
     @Bean
@@ -51,5 +41,31 @@ class SecurityConfig {
         val encoder = BCryptPasswordEncoder()
         println("Password encoder created: $encoder")
         return encoder
+    }
+
+    @Bean
+    fun jdbcUserDetailsManager(): JdbcUserDetailsManager {
+        val jdbcUserDetailsManager = JdbcUserDetailsManager(dataSource)
+        jdbcUserDetailsManager.setUsersByUsernameQuery("SELECT username, password, enabled FROM users WHERE username=?")
+        jdbcUserDetailsManager.setAuthoritiesByUsernameQuery("SELECT username, authority FROM authorities WHERE username=?")
+        return jdbcUserDetailsManager
+    }
+
+    companion object {
+        @JvmStatic
+        fun generateBcryptHash(password: String): String {
+            val encoder = BCryptPasswordEncoder()
+            return encoder.encode(password)
+        }
+
+    }
+    object PasswordHashGenerator {
+        @JvmStatic
+        fun main(args: Array<String>) {
+            val encoder = BCryptPasswordEncoder()
+            val rawPassword = "admin"
+            val encodedPassword = encoder.encode(rawPassword)
+            println("Use this hash in your Liquibase changelog: $encodedPassword")
+        }
     }
 }
