@@ -30,7 +30,7 @@ class SecurityConfig(private val dataSource: DataSource) {
             .formLogin { formLogin ->
                 formLogin
                     .loginPage("/login")
-                    .defaultSuccessUrl("/record", true)
+                    .defaultSuccessUrl("http://localhost:3000", true)
                     .permitAll()
             }
             .userDetailsService(jdbcUserDetailsManager())
