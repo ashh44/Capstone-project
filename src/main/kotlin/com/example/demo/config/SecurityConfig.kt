@@ -24,11 +24,13 @@ class SecurityConfig(private val dataSource: DataSource) {
                 requests
                     .requestMatchers("/login").permitAll()
                     .requestMatchers("/admin").hasRole("ADMIN")
+                    .requestMatchers("/record").authenticated()
                     .anyRequest().authenticated()
             }
             .formLogin { formLogin ->
                 formLogin
                     .loginPage("/login")
+                    .defaultSuccessUrl("/record", true)
                     .permitAll()
             }
             .userDetailsService(jdbcUserDetailsManager())
