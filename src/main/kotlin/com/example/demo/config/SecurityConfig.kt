@@ -29,11 +29,13 @@ class SecurityConfig {
                 auth
                     .requestMatchers("/login").permitAll()
                     .requestMatchers("/admin", "/api/users").hasRole("ADMIN")
+                    .requestMatchers("/record").authenticated()
                     .anyRequest().authenticated()
             }
             .formLogin { form ->
                 form
                     .loginPage("/login")
+                    .defaultSuccessUrl("http://localhost:3000", true)
                     .permitAll()
             }
             .httpBasic { }
