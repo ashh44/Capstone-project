@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-@SpringBootApplication(exclude = [SecurityAutoConfiguration::class])
+@SpringBootApplication()
 
 @ComponentScan(basePackages = ["com.example.demo"])
 class DemoApplication

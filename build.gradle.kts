@@ -43,6 +43,8 @@ dependencies {
 	// implementation("org.springframework.security:spring-security-oauth2-authorization-server")
 	// implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+
+
 	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 	implementation("org.springframework.boot:spring-boot-starter-jdbc")
 	implementation("org.liquibase:liquibase-core")
