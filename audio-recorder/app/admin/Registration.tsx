@@ -3,44 +3,34 @@ import React, { useState } from 'react';
 const RegisterForm: React.FC = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [message, setMessage] = useState('');  // State to store success/error message
+    const [messageType, setMessageType] = useState(''); // 'success' or 'error'
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
-const checkAuth = async () => {
-    try {
-      const response = await fetch('http://localhost:8080/api/check-auth', {
-        method: 'GET',
-        credentials: 'include', // This is important for including cookies
-      });
-      if (response.ok) {
-        const data = await response.json();
-        if (data.authenticated) {
-          setIsAuthenticated(true);
-        } else {
-          window.location.href = '/login';
-        }
-      } else {
-        window.location.href = '/login';
-      }
-    } catch (error) {
-      console.error('Error checking authentication:', error);
-      window.location.href = '/login';
-    }
-  };
-        // Implement your form submission logic here
-        const response = await fetch('http://localhost:8080/api/users', {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ username, password, authorities: ['ROLE_USER'] }),
-        });
 
-        if (response.ok) {
-            console.log('User registered successfully!');
-        } else {
-            console.error('Failed to register user.');
+        try {
+            const response = await fetch('http://localhost:8080/api/users', {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password, authorities: ['ROLE_USER'] }),
+            });
+
+            if (response.ok) {
+                setMessage('User added successfully!');
+                setMessageType('success');
+                setUsername(''); // Clear input fields
+                setPassword('');
+            } else {
+                setMessage('User registration failed.');
+                setMessageType('error');
+            }
+        } catch (error) {
+            setMessage('User registration failed.');
+            setMessageType('error');
         }
     };
 
@@ -81,6 +71,13 @@ const checkAuth = async () => {
                     Register
                 </button>
             </form>
+
+            {/* Show success or error message */}
+            {message && (
+                <p className={`mt-4 text-center ${messageType === 'success' ? 'text-green-500' : 'text-red-500'}`}>
+                    {message}
+                </p>
+            )}
         </div>
     );
 };

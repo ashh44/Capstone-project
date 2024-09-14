@@ -1,9 +1,38 @@
 // app/admin/page.tsx
 "use client";
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import RegisterForm from './registration';
 
+
 const AdminPage: React.FC = () => {
+    const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+
+    useEffect(() => {
+        checkAuth(); // Call authentication check
+     }, []);
+
+    const checkAuth = async () => {
+        try {
+          const response = await fetch('http://localhost:8080/api/check-auth', {
+            method: 'GET',
+            credentials: 'include', // This is important for including cookies
+          });
+          if (response.ok) {
+            const data = await response.json();
+            if (data.authenticated) {
+              setIsAuthenticated(true);
+            } else {
+              window.location.href = '/login';
+            }
+          } else {
+            window.location.href = '/login';
+          }
+        } catch (error) {
+          console.error('Error checking authentication:', error);
+          window.location.href = '/login';
+        }
+      };
+
     return (
         <div className="min-h-screen bg-blue-900 flex flex-col">
             <header className="w-full flex justify-between items-center px-6 py-4">
