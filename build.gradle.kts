@@ -70,3 +70,7 @@ tasks.withType<Test> {
 kotlin {
 	jvmToolchain(18)
 }
+
+springBoot{
+	mainClass.set("com.demo.example.DemoApplicationKt")
+}
