@@ -8,5 +8,6 @@ import org.springframework.stereotype.Repository
 @Repository
 interface UserRepository : JpaRepository<User, String>
 
+//consult history repo
 @Repository
 interface ConsultHistoryRepository : JpaRepository<ConsultHistory, String>

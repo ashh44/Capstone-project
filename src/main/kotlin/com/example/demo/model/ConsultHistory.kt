@@ -16,6 +16,6 @@ data class ConsultHistory(
     val userName: String
 )
 {
-    // No-argument constructor for Hibernate
+    // No-argument constructor
     constructor() : this("", ZonedDateTime.now(), null, null, "")
 }

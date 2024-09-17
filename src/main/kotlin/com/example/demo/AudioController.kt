@@ -45,7 +45,7 @@ class AudioController(private val audioConversionService: AudioConversionService
             if (authentication != null && authentication.getPrincipal() is UserDetails) {
                 username = (authentication.getPrincipal() as UserDetails).username
             }
-            // Check if consultHistory record exists for this uuid
+            // Check if consultHistory record exists for this UUID
             if (!consultHistoryRepository.existsById(uuid)) {
 
                 // If not, create a new record
