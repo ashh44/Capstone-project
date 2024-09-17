@@ -45,3 +45,13 @@ VALUES ('admin', '$2a$10$pQ77LG9/tqHr4ob8.lJ09OYm.gxv0aR3rwP2XhoHyEJ1n2D8nYI4', 
 
 INSERT INTO authorities (username, authority)
 VALUES ('admin', 'ROLE_ADMIN');
+
+-- changeset author:yourname:4
+
+CREATE TABLE consult_history (
+    session_id CHAR(36) NOT NULL PRIMARY KEY,
+    creation_time TIMESTAMP WITH TIME ZONE NOT NULL,
+    summary VARCHAR(1000),
+    letter VARCHAR(1000),
+    user_name VARCHAR(100)
+);
