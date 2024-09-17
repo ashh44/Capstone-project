@@ -7,13 +7,14 @@ import RegisterForm from './registration';
 const AdminPage: React.FC = () => {
     const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
-    useEffect(() => {
+    //commented by sahithi -  as we dont need another authentication check as admin landed on registration with prior check implemented in backend
+    /*useEffect(() => {
         checkAuth(); // Call authentication check
      }, []);
 
     const checkAuth = async () => {
         try {
-          const response = await fetch('http://localhost:8080/api/check-auth', {
+          const response = await fetch('http://localhost:8080/login', {
             method: 'GET',
             credentials: 'include', // This is important for including cookies
           });
@@ -32,7 +33,7 @@ const AdminPage: React.FC = () => {
           window.location.href = '/login';
         }
       };
-
+*/
     return (
         <div className="min-h-screen bg-blue-900 flex flex-col">
             <header className="w-full flex justify-between items-center px-6 py-4">
