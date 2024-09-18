@@ -45,3 +45,16 @@ VALUES ('admin', '$2a$10$pQ77LG9/tqHr4ob8.lJ09OYm.gxv0aR3rwP2XhoHyEJ1n2D8nYI4', 
 
 INSERT INTO authorities (username, authority)
 VALUES ('admin', 'ROLE_ADMIN');
+
+-- changeset author:yourname:4
+CREATE TABLE consult_history (
+    id BIGSERIAL PRIMARY KEY,
+    session_id UUID NOT NULL,
+    creation_time TIMESTAMP WITH TIME ZONE NOT NULL,
+    summary TEXT,
+    letter TEXT,
+    username VARCHAR(255) NOT NULL
+);
+
+CREATE INDEX idx_consult_history_username ON consult_history(username);
+CREATE INDEX idx_consult_history_session_id ON consult_history(session_id);

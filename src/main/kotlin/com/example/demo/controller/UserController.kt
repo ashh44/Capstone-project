@@ -18,4 +18,17 @@ class UserController(private val userService: UserService) {
     }
 }
 
+@RestController
+@RequestMapping("/api")
+class UserController1(private val userService: UserService) {
+
+    @PostMapping("/register")
+    fun registerUser(@RequestBody user: User): ResponseEntity<String> {
+        // Logic to create user
+        return ResponseEntity.ok("User created successfully")
+    }
+}
+
+
+
 data class CreateUserRequest(val username: String, val password: String, val authorities: Set<String>)

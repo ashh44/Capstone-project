@@ -26,13 +26,22 @@ class HomeController {
         return "redirect:/home"
     }
 
+    //@GetMapping("/admin")
+    //fun admin(model: Model): String {
+    //  model.addAttribute("message", "Welcome to the admin page!")
+    //  return "admin"
+    // }
     @GetMapping("/admin")
-    fun admin(model: Model): String {
-        model.addAttribute("message", "Welcome to the admin page!")
-        return "admin"
+    fun registrationPage(): String {
+        return "http://localhost:3002/admin" // Ensure this maps to the registration page (e.g., registration.html)
+    }
+
+    @GetMapping("/record")
+    fun recordPage(): String {
+        return "http://localhost:3002/record" // Ensure this maps to the record page (e.g., record.html)
     }
 }
-@RestController
+
 class TestController {
 
     @GetMapping("/test")
