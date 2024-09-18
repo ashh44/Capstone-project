@@ -10,13 +10,13 @@ export default function Record() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const scriptNodeRef = useRef<ScriptProcessorNode | null>(null);
 
-  useEffect(() => {
+ /* useEffect(() => {
     checkAuth();
   }, []);
 
   const checkAuth = async () => {
     try {
-      const response = await fetch('/api/check-auth', {
+      const response = await fetch('/login/api/check-auth', {
         method: 'GET',
         credentials: 'include', // This is important for including cookies
       });
@@ -35,7 +35,7 @@ export default function Record() {
       window.location.href = '/login';
     }
   };
-
+*/
   useEffect(() => {
     if (isRecording) {
       const startRecording = async () => {

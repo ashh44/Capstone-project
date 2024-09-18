@@ -70,3 +70,4 @@ tasks.withType<Test> {
 kotlin {
 	jvmToolchain(18)
 }
+
