@@ -23,7 +23,7 @@ class HomeController {
     @PostMapping("/login")
     fun loginSubmit(): String {
         println("Login POST received")
-        return "redirect:/home"
+        return "redirect:/usershistory" //changed from home to usershistory
     }
 
     //@GetMapping("/admin")
@@ -33,12 +33,22 @@ class HomeController {
     // }
     @GetMapping("/admin")
     fun registrationPage(): String {
-        return "http://localhost:3002/admin" // Ensure this maps to the registration page (e.g., registration.html)
+        return "http://localhost:3000/admin" // Ensure this maps to the registration page (e.g., registration.html)
     }
 
     @GetMapping("/record")
     fun recordPage(): String {
-        return "http://localhost:3002/record" // Ensure this maps to the record page (e.g., record.html)
+        return "http://localhost:3000/record" // Ensure this maps to the record page (e.g., record.html)
+    }
+
+    @GetMapping("/context")
+    fun usercontext(): String {
+        return "http://localhost:3000/context" // Ensure this maps to the user context page (e.g., usercontext.tsx)
+    }
+
+    @GetMapping("/consultshistory")  //
+    fun usersHistoryPage(): String {
+        return "http://localhost:3000/consulthistory"  //
     }
 }
 

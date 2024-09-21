@@ -18,11 +18,16 @@ class CustomAuthenticationSuccessHandler : AuthenticationSuccessHandler {
         response: HttpServletResponse?,
         authentication: Authentication?
     ) {
-        // Check roles and redirect accordingly
-        if (authentication?.authorities?.contains(SimpleGrantedAuthority("ROLE_ADMIN")) == true) {
-            response?.sendRedirect("http://localhost:3000/admin")
-        } else {
-            response?.sendRedirect("http://localhost:3000/record")
+        when {
+            authentication?.authorities?.contains(SimpleGrantedAuthority("ROLE_ADMIN")) == true -> {
+                response?.sendRedirect("http://localhost:3000/admin")
+            }
+            authentication?.authorities?.contains(SimpleGrantedAuthority("ROLE_USER")) == true -> {
+                response?.sendRedirect("http://localhost:3000/consultshistory")  // Changed to match the exact endpoint
+            }
+            else -> {
+                response?.sendRedirect("http://localhost:8080/login")
+            }
         }
     }
 }

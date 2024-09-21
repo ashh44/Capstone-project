@@ -48,6 +48,7 @@ class SecurityConfig(private val dataSource: DataSource) {
                     .requestMatchers("/api/consult/letter").authenticated()
                     .requestMatchers("/api/consult/summary").authenticated()
                     .requestMatchers("/api/consult/new-session").authenticated()
+                    .requestMatchers("/consultshistory").authenticated()
                     .anyRequest().authenticated()
             }
             .formLogin { form ->
