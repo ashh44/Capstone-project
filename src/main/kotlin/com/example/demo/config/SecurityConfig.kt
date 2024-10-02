@@ -12,6 +12,9 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.provisioning.JdbcUserDetailsManager
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.CorsConfigurationSource
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import java.util.*
@@ -42,12 +45,15 @@ class SecurityConfig(private val dataSource: DataSource) {
             .csrf { it.disable() }
             .authorizeHttpRequests { auth ->
                 auth
-                    .requestMatchers("/login").permitAll()
+                    .requestMatchers("/login", "/api/check-auth","/home").permitAll()
                     .requestMatchers("/admin", "/api/users").hasRole("ADMIN")
                     .requestMatchers("/api/consult/history").authenticated()
                     .requestMatchers("/api/consult/letter").authenticated()
                     .requestMatchers("/api/consult/summary").authenticated()
                     .requestMatchers("/api/consult/new-session").authenticated()
+                    .requestMatchers("/deepgram-proxy").permitAll()
+
+
                     .anyRequest().authenticated()
             }
             .formLogin { form ->
@@ -55,6 +61,7 @@ class SecurityConfig(private val dataSource: DataSource) {
                     .loginPage("/login")
                     .loginProcessingUrl("/login")
                     //.defaultSuccessUrl("/home", true)
+                    .defaultSuccessUrl("/record", true)
                     .successHandler(customAuthenticationSuccessHandler())
                     .failureUrl("/login?error=true")
                     .permitAll()
@@ -64,18 +71,21 @@ class SecurityConfig(private val dataSource: DataSource) {
         return http.build()
     }
 
+
     @Bean
-    fun corsConfigurer(): WebMvcConfigurer {
-        return object : WebMvcConfigurer {
-            override fun addCorsMappings(registry: CorsRegistry) {
-                registry.addMapping("/**")
-                    .allowedOrigins("http://localhost:3000")  // Allow requests from Next.js app
-                    .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                    .allowedHeaders("*")
-                    .allowCredentials(true)
-            }
-        }
+    fun corsConfigurationSource(): CorsConfigurationSource {
+        val configuration = CorsConfiguration()
+        configuration.allowedOrigins = listOf("http://localhost:3000")
+        configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
+        configuration.allowCredentials = true
+        configuration.allowedHeaders = listOf("*")
+        configuration.exposedHeaders = listOf("Authorization", "Content-Type")
+        configuration.allowCredentials = true
+        val source = UrlBasedCorsConfigurationSource()
+        source.registerCorsConfiguration("/**", configuration)
+        return source
     }
+
 
     @Bean
     fun userDetailsService(): UserDetailsService {

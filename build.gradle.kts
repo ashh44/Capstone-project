@@ -45,10 +45,20 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
 
+	testImplementation("io.mockk:mockk:1.12.0")
+	testImplementation("org.testcontainers:postgresql:1.17.3")
+
+	testImplementation("com.ninja-squad:springmockk:3.0.1")
+
+
 	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 	implementation("org.springframework.boot:spring-boot-starter-jdbc")
 	implementation("org.liquibase:liquibase-core")
+	implementation("org.springframework.boot:spring-boot-starter-websocket")
+	implementation("org.java-websocket:Java-WebSocket:1.5.3")
 	runtimeOnly("org.postgresql:postgresql")
+	implementation("jakarta.websocket:jakarta.websocket-api:2.0.0")
+	implementation("org.springframework.boot:spring-boot-starter-reactor-netty")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -58,6 +68,7 @@ dependencies {
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
 	testImplementation("org.springframework.security:spring-security-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
 	implementation("com.squareup.okhttp3:okhttp:4.9.3")
 	implementation("org.json:json:20211205")
 	implementation("com.google.code.gson:gson:2.10.1")
