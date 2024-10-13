@@ -73,18 +73,17 @@ class SecurityConfig(private val dataSource: DataSource) {
 
 
     @Bean
-    fun corsConfigurationSource(): CorsConfigurationSource {
-        val configuration = CorsConfiguration()
-        configuration.allowedOrigins = listOf("http://localhost:3000")
-        configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
-        configuration.allowCredentials = true
-        configuration.allowedHeaders = listOf("*")
-        configuration.exposedHeaders = listOf("Authorization", "Content-Type")
-        configuration.allowCredentials = true
-        val source = UrlBasedCorsConfigurationSource()
-        source.registerCorsConfiguration("/**", configuration)
-        return source
-    }
+    fun corsConfigurer(): WebMvcConfigurer {
+        return object : WebMvcConfigurer {
+            override fun addCorsMappings(registry: CorsRegistry) {
+                registry.addMapping("/**")
+                    .allowedOrigins("http://localhost:3000")  // Allow requests from Next.js app
+                    .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                    .allowedHeaders("*")
+                    .allowCredentials(true)
+            }
+        }
+        }
 
 
     @Bean
