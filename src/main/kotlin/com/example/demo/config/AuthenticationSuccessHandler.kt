@@ -3,6 +3,7 @@ package com.example.demo.config
 import jakarta.servlet.ServletException
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler
@@ -12,6 +13,15 @@ import java.io.IOException
 @Component
 class CustomAuthenticationSuccessHandler : AuthenticationSuccessHandler {
 
+    @Value("\${frontend.admin-url}")
+    private lateinit var adminUrl: String
+
+    @Value("\${frontend.user-url}")
+    private lateinit var userUrl: String
+
+    @Value("\${backend.login-url}")
+    private lateinit var loginUrl: String
+
     @Throws(IOException::class, ServletException::class)
     override fun onAuthenticationSuccess(
         request: HttpServletRequest?,
@@ -20,13 +30,13 @@ class CustomAuthenticationSuccessHandler : AuthenticationSuccessHandler {
     ) {
         when {
             authentication?.authorities?.contains(SimpleGrantedAuthority("ROLE_ADMIN")) == true -> {
-                response?.sendRedirect("http://localhost:3000/admin")
+                response?.sendRedirect(adminUrl)
             }
             authentication?.authorities?.contains(SimpleGrantedAuthority("ROLE_USER")) == true -> {
-                response?.sendRedirect("http://localhost:3000/consultshistory")  // Changed to match the exact endpoint
+                response?.sendRedirect(userUrl)
             }
             else -> {
-                response?.sendRedirect("http://localhost:8080/login")
+                response?.sendRedirect(loginUrl)
             }
         }
     }

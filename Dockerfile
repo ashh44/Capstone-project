@@ -1,22 +1,39 @@
-FROM gradle:7.6-jdk AS build
+#========================================================================================================
+#Step 1: Build Stage
+FROM node:18-alpine AS build
+
+# Set working directory
 WORKDIR /app
-COPY src/main /app/src/main
-COPY build.gradle.kts /app
-COPY audio_files /app/audio_files
-COPY src/main ./support/src/main
-COPY build.gradle.kts ./support
 
-COPY build.gradle.kts  /app
-COPY settings.gradle.kts /app
+# Install dependencies
+COPY ../audio-recorder/package*.json ./
+RUN npm install
 
-RUN gradle clean build
+# Copy project files
+# Copy all required project files
+COPY ../audio-recorder/app ./app
+COPY ../audio-recorder/public ./public
+COPY ../audio-recorder/tsconfig.json ./tsconfig.json
+COPY ../audio-recorder/postcss.config.mjs ./postcss.config.mjs
+COPY ../audio-recorder/tailwind.config.ts ./tailwind.config.ts
+COPY ../audio-recorder/next.config.mjs ./next.config.mjs
 
-FROM openjdk:17.0.1-jdk-slim AS run
+# Build Next.js app
+RUN npm run build
 
-RUN adduser --system --group app-user
+# Step 2: Production Stage
+FROM node:18-alpine AS production
+
 WORKDIR /app
-COPY --from=build --chown=app-user:app-user /app/build/libs/demo-0.0.1-SNAPSHOT.jar /app/app.jar
-EXPOSE 8080
-USER app-user
 
-CMD ["java", "-jar", "app.jar"]
+# Install serve to serve the Next.js app
+RUN npm install -g serve
+
+# Copy the built files from the previous stage
+COPY --from=build /app ./
+
+# Expose the port for the Next.js app
+EXPOSE 3000
+
+# Start the app
+CMD ["npm", "start"]

@@ -24,7 +24,8 @@ const LiveTranscription: React.FC = () => {
       scriptProcessorRef.current = scriptProcessor;
 
       // Open the WebSocket connection
-      socketRef.current = new WebSocket('ws://localhost:8080/deepgram-proxy');
+      const webSocketUrl = process.env.NEXT_PUBLIC_WEBSOCKET_URL || 'ws://localhost:8080';
+      socketRef.current = new WebSocket(`${webSocketUrl}/deepgram-proxy`);
       socketRef.current.onopen = () => {
         console.log('WebSocket connection opened');
       };
@@ -65,8 +66,9 @@ const LiveTranscription: React.FC = () => {
 
       setIsTranscribing(true);
     } catch (err) {
-      console.error('Error accessing microphone:', err);
-      setError('Error accessing microphone: ' + err.message);
+    const error = err as Error;
+    console.error('Error accessing microphone:', error);
+    setError('Error accessing microphone: ' + error.message);
       setIsTranscribing(false);
     }
   };

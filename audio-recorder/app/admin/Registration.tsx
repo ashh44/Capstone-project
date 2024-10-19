@@ -10,7 +10,8 @@ const RegisterForm: React.FC = () => {
         event.preventDefault();
 
         try {
-            const response = await fetch('http://localhost:8080/api/users', {
+            const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080';
+            const response = await fetch(`${backendUrl}/api/users`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {

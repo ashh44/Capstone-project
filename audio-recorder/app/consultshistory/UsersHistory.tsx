@@ -4,7 +4,7 @@
 
 import React, { useState, useEffect, useContext } from 'react';
 import { useRouter } from 'next/navigation';
-import { UserContext } from '../context/UserContext'; // Ensure this path is correct
+import { UserContext } from '../Context/UserContext'; // Ensure this path is correct
 
 interface HistoryRecord {
   creationTime: string;
@@ -24,7 +24,8 @@ const UserHistory: React.FC = () => {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const response = await fetch('http://localhost:8080/api/consult/history', {
+        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080';
+        const response = await fetch(`${backendUrl}/api/consult/history`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -50,11 +51,6 @@ const UserHistory: React.FC = () => {
   const handleGoToRecord = () => {
     router.push('/record');
   };
-
-  // delete this after testing
-  const handleGoToTest = () => {
-      router.push('/test');
-    };
 
   if (error) {
     return <div className="text-red-500">{error}</div>;
@@ -94,12 +90,6 @@ const UserHistory: React.FC = () => {
           className="w-full bg-indigo-500 text-white py-2 px-4 rounded-lg hover:bg-indigo-600 focus:outline-none focus:bg-indigo-600"
         >
           Go to Record Page
-        </button>
-        <button
-          onClick={handleGoToTest}
-          className="w-full bg-indigo-500 text-white py-2 px-4 rounded-lg hover:bg-indigo-600 focus:outline-none focus:bg-indigo-600"
-        >
-          Go to test Page
         </button>
       </div>
     </div>

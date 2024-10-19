@@ -1,14 +1,13 @@
 // app/admin/page.tsx
 "use client";
 import React, { useState, useEffect } from 'react';
-import RegisterForm from './registration';
+import RegisterForm from './Registration';
 
 
 const AdminPage: React.FC = () => {
     const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
-    //commented by sahithi -  as we dont need another authentication check as admin landed on registration with prior check implemented in backend
-    /*useEffect(() => {
+   /* useEffect(() => {
         checkAuth(); // Call authentication check
      }, []);
 
@@ -32,8 +31,8 @@ const AdminPage: React.FC = () => {
           console.error('Error checking authentication:', error);
           window.location.href = '/login';
         }
-      };
-*/
+      };*/
+
     return (
         <div className="min-h-screen bg-blue-900 flex flex-col">
             <header className="w-full flex justify-between items-center px-6 py-4">

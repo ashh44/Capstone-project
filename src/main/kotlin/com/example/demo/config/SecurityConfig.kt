@@ -1,6 +1,7 @@
 package com.example.demo.config
 import jakarta.annotation.PostConstruct
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
@@ -30,6 +31,8 @@ class SecurityConfig(private val dataSource: DataSource) {
     init {
         logger.info("SecurityConfig is initialized")
     }
+    @Value("\${frontend.cors-origin}")
+    private lateinit var frontendCorsOrigin: String
     //    @PostConstruct
 //    fun postConstruct() {
 //        logger.info("SecurityConfig has been fully initialized")
@@ -73,19 +76,17 @@ class SecurityConfig(private val dataSource: DataSource) {
 
 
     @Bean
-    fun corsConfigurationSource(): CorsConfigurationSource {
-        val configuration = CorsConfiguration()
-        configuration.allowedOrigins = listOf("http://localhost:3000")
-        configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
-        configuration.allowCredentials = true
-        configuration.allowedHeaders = listOf("*")
-        configuration.exposedHeaders = listOf("Authorization", "Content-Type")
-        configuration.allowCredentials = true
-        val source = UrlBasedCorsConfigurationSource()
-        source.registerCorsConfiguration("/**", configuration)
-        return source
+    fun corsConfigurer(): WebMvcConfigurer {
+        return object : WebMvcConfigurer {
+            override fun addCorsMappings(registry: CorsRegistry) {
+                registry.addMapping("/**")
+                    .allowedOrigins(frontendCorsOrigin)  // Allow requests from Next.js app
+                    .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                    .allowedHeaders("*")
+                    .allowCredentials(true)
+            }
+        }
     }
-
 
     @Bean
     fun userDetailsService(): UserDetailsService {
