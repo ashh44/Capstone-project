@@ -15,7 +15,7 @@ class AudioWebsocketHandler : TextWebSocketHandler() {
 
     private val logger = LoggerFactory.getLogger(AudioWebsocketHandler::class.java)
     private val deepgramApiKey = "f4e5ae7c485385f78b03c165bb199e5dc4f08377"
-    private val deepgramUrl = "wss://api.deepgram.com/v1/listen?encoding=linear16&sample_rate=44100&channels=1&punctuate=true&language=en-US&interim_results=true"
+    private val deepgramUrl = "wss://api.deepgram.com/v1/listen?encoding=linear16&sample_rate=44100&channels=1&punctuate=true&language=en-US"
 
     private val sessions = mutableMapOf<WebSocketSession, DeepgramWebSocketClient>()
     private val objectMapper = ObjectMapper()
