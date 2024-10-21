@@ -2,7 +2,12 @@ package com.example.demo
 
 import com.example.demo.repository.ConsultHistoryRepository
 import com.example.demo.model.ConsultHistory
+import com.example.demo.model.GenerateSummaryRequest
+import com.example.demo.model.SaveRecordingRequest
 import com.example.demo.service.ConsultHistoryService
+import com.example.demo.service.TranscriptionService
+import com.example.demo.service.ClinicalNoteService
+import com.example.demo.service.LetterService
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -18,12 +23,19 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.UUID
 
+
 @RestController
 @RequestMapping("/api/consult/{uuid}")
 class AudioController(
     private val audioConversionService: AudioConversionService,
     private val consultHistoryRepository: ConsultHistoryRepository,
-    private val consultHistoryService: ConsultHistoryService
+    private val consultHistoryService: ConsultHistoryService,
+    private val transcriptionService: TranscriptionService,
+    private val clinicalNoteService: ClinicalNoteService,
+    private val letterService: LetterService,
+    //private val consultService: ConsultService
+
+
 ) {
     private val baseDir = "audio_files/"
 
@@ -65,6 +77,66 @@ class AudioController(
         }
     }
 
+    @PostMapping("/save")
+    fun saveRecording(
+        @PathVariable uuid: UUID,
+        @RequestBody request: SaveRecordingRequest
+    ): ResponseEntity<String> {
+        val binFile = File("$baseDir$uuid.bin")
+
+        return try {
+            // Save the .bin file
+            audioConversionService.saveBinFile(uuid, request.audioData)
+
+            //  Create new ConsultHistory if not exists
+            val authentication = SecurityContextHolder.getContext().authentication
+            val username = if (authentication.principal is UserDetails) {
+                (authentication.principal as UserDetails).username
+            } else {
+                request.userName // Fallback to the passed username
+            }
+
+            consultHistoryService.createNewSession(uuid, username)
+
+            ResponseEntity.ok("Recording saved successfully.")
+        } catch (e: Exception) {
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to save recording: ${e.message}")
+        }
+    }
+
+    @PostMapping("/generate-summary")
+    fun generateSummaryAndLetter(
+        @PathVariable ("uuid") sessionId: UUID,
+        @RequestBody request: GenerateSummaryRequest
+    ): ResponseEntity<String> {
+        return try {
+
+
+            // Step 1: Convert .bin to .wav
+            val wavFile = audioConversionService.getOrCreateWavFile(sessionId)
+            println("wav file generated: $wavFile")
+            // Step 2: Transcribe the audio file
+            val transcriptionText = transcriptionService.transcribeAudio(wavFile)
+            println("Transcription text: $transcriptionText")
+            // Step 3: Generate the clinical notes (summary)
+            val summary = clinicalNoteService.generateClinicalNotes(transcriptionText)
+
+            // Step 4: Generate the consult letter
+            val consultLetter = letterService.generateConsultLetter(transcriptionText)
+
+
+            //  Update ConsultHistory with the summary and letter
+            consultHistoryService.updateSummary(sessionId, summary)
+            consultHistoryService.updateLetter(sessionId, consultLetter)
+
+            ResponseEntity.ok("Summary and letter generated successfully.")
+        } catch (e: Exception) {
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Failed to generate summary and letter: ${e.message}")
+        }
+    }
+}
+/*
     @GetMapping("/audio-file")
     fun getAudioFile(@PathVariable uuid: UUID): ResponseEntity<ByteArray> {  // Changed to UUID
         val file = File("$baseDir$uuid.bin")
@@ -88,4 +160,4 @@ class AudioController(
 
         return ResponseEntity(audioBytes, headers, HttpStatus.OK)
     }
-}
+}*/
