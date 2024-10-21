@@ -3,41 +3,50 @@ package com.example.demo
 import org.springframework.stereotype.Service
 import java.io.File
 import java.util.UUID
+import java.util.Base64
 
 @Service
 class AudioConversionService {
+
     private val baseDir = "audio_files/"
-    fun convertBinToWav(uuid: UUID): Pair<File, String> {
-        // Here is the input and output file paths (make sure the directory exists)
-        val inputFile = File("$baseDir$uuid.bin")
-        val outputFile = File("$baseDir$uuid.wav")
 
-        // Construct the FFmpeg command
-        val command = arrayOf(
-            "ffmpeg",
-            "-f", "s16le",     // Input format: signed 16-bit little-endian
-            "-ar", "44100",    // Sample rate: 44.1kHz
-            "-ac", "1",        // Audio channels: 1 (mono)
-            "-i", inputFile.absolutePath,  // Input file
-            "-acodec", "pcm_s16le",  // Output codec: PCM 16-bit little-endian
-            outputFile.absolutePath  // Output file
-        )
+    fun saveBinFile(uuid: UUID, base64Audio: String) {
+        val binFile = File("$baseDir$uuid.bin")
+        val decodedBytes = Base64.getDecoder().decode(base64Audio)
+        binFile.writeBytes(decodedBytes)
+        println("Saved .bin file for session ID: $uuid")
+    }
 
-        // Execute the FFmpeg command
-        val process = ProcessBuilder(*command)
-            .redirectErrorStream(true)
-            .start()
+    fun getOrCreateWavFile(uuid: UUID): File {
+        val wavFile = File("$baseDir$uuid.wav")
 
-        // Wait for the process to complete
-        process.waitFor()
-
-        // Check if the conversion was successful
-        if (process.exitValue() != 0) {
-            throw RuntimeException("FFmpeg conversion failed.")
+        if (wavFile.exists()) {
+            println("Cached .wav file found for session ID: $uuid")
+            return wavFile
         }
 
-        // Output a success message
-        val successMessage = "FFmpeg conversion completed successfully. UUID: $uuid"
-        return Pair(outputFile, successMessage)
+        val binFile = File("$baseDir$uuid.bin")
+        if (!binFile.exists()) {
+            throw RuntimeException("Input .bin file does not exist: ${binFile.absolutePath}")
+        }
+
+        val command = arrayOf(
+            "ffmpeg",
+            "-f", "s16le",
+            "-ar", "44100",
+            "-ac", "1",
+            "-i", binFile.absolutePath,
+            wavFile.absolutePath
+        )
+
+        val process = ProcessBuilder(*command).redirectErrorStream(true).start()
+        process.waitFor()
+
+        if (process.exitValue() != 0) {
+            throw RuntimeException("FFmpeg conversion failed")
+        }
+
+        println("Successfully created .wav file for session ID: $uuid")
+        return wavFile
     }
 }
