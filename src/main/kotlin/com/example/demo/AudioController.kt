@@ -82,6 +82,10 @@ class AudioController(
         @PathVariable uuid: UUID,
         @RequestBody request: SaveRecordingRequest
     ): ResponseEntity<String> {
+        val dir = File(baseDir)
+        if (!dir.exists()) {
+            dir.mkdirs()
+        }
         val binFile = File("$baseDir$uuid.bin")
 
         return try {

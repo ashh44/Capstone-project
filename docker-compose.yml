@@ -59,7 +59,7 @@ version: '3'
 
 services:
   frontend:
-    image: capstone910/healthcare-workflow:webapp-v1.6.0  # Private repo for frontend
+    image: capstone910/healthcare-workflow:webapp-v1.7.0  # Private repo for frontend
     container_name: frontend-service
     ports:
       - "3000:3000"  # Maps host port 3000 to container port 3000
@@ -73,7 +73,7 @@ services:
       - NEXT_PUBLIC_WEBSOCKET_URL=ws://backend:8080
 
   backend:
-    image: capstone910/healthcare-workflow:api-v1.7.0  # Private repo for backend
+    image: capstone910/healthcare-workflow:api-v1.11.0  # Private repo for backend
     container_name: backend-service
     ports:
       - "8080:8080"  # Maps host port 8080 to container port 8080
