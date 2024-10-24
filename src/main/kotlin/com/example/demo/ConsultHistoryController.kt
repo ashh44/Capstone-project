@@ -41,13 +41,13 @@ class ConsultHistoryController(private val service: ConsultHistoryService) {
         return ResponseEntity.ok(dtos)
     }
 
-    // New endpoint for downloading session data as text file
+    
     @GetMapping("/{sessionId}/download")
     fun downloadSessionData(@PathVariable sessionId: UUID): ResponseEntity<ByteArray> {
-        // Fetch the ConsultHistory for the given sessionId
+        
         val consultHistory = service.getHistoryBySessionId(sessionId)
 
-        // Construct the content of the text file
+        
         val fileContent = """
             Session ID: ${consultHistory.sessionId}
             Timestamp: ${consultHistory.creationTime}
