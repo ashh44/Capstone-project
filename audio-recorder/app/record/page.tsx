@@ -137,7 +137,7 @@ export default function Record() {
         body: JSON.stringify({
            // sessionId: sessionId,
             //audioData: base64Audio,
-            userName: "user5", // This must be included
+            userName: "user5", 
 
           }),
       credentials: 'include',
