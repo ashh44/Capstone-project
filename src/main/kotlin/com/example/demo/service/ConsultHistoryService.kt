@@ -33,4 +33,12 @@ class ConsultHistoryService(private val repository: ConsultHistoryRepository) {
     fun getHistoryForUser(username: String): List<ConsultHistory> {
         return repository.findByUserName(username)
     }
+
+
+    fun getHistoryBySessionId(sessionId: UUID): ConsultHistory {
+        return repository.findById(sessionId).orElseThrow {
+            IllegalArgumentException("Session not found for ID: $sessionId")
+        }
+    }
+
 }

@@ -1,5 +1,4 @@
-"use client"; // Ensure this component is rendered on the client side
-
+"use client"; 
 import { useState, useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -138,7 +137,7 @@ export default function Record() {
         body: JSON.stringify({
            // sessionId: sessionId,
             //audioData: base64Audio,
-            userName: "user5", // This must be included
+            userName: "user5", 
 
           }),
       credentials: 'include',
