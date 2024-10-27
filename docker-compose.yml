@@ -13,8 +13,8 @@ services:
       - postgres
     environment:
       - NODE_ENV=production
-      - NEXT_PUBLIC_BACKEND_URL=http://3.106.13.250  # Use HTTP
-      - NEXT_PUBLIC_WEBSOCKET_URL=ws://3.106.13.250  # Use WS for secure WebSocket
+      - NEXT_PUBLIC_BACKEND_URL=http://3.106.13.250 
+      - NEXT_PUBLIC_WEBSOCKET_URL=ws://3.106.13.250  
     command: "sh -c 'sleep 10 && npm run build && npm start'"
 
   backend:
@@ -27,11 +27,11 @@ services:
     depends_on:
       - postgres
     environment:
-      - USER_URL=http://3.106.13.250/consultshistory  # Use HTTPS
+      - USER_URL=http://3.106.13.250/consultshistory 
       - DB_URL=jdbc:postgresql://postgres:5432/postgres
-      - ADMIN_URL=http://3.106.13.250/admin  # Use HTTPS
-      - LOGIN_URL=http://3.106.13.250/login  # Use HTTPS
-      - FRONTEND_CORS_ORIGIN=http://3.106.13.250  # Use HTTPS
+      - ADMIN_URL=http://3.106.13.250/admin  
+      - LOGIN_URL=http://3.106.13.250/login  
+      - FRONTEND_CORS_ORIGIN=http://3.106.13.250  
 
   postgres:
     image: postgres:latest
