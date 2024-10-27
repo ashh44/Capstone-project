@@ -59,48 +59,80 @@ version: '3'
 
 services:
   frontend:
-    image: capstone910/healthcare-workflow:webapp-v1.7.0  # Private repo for frontend
+    image: capstone910/healthcare-workflow:webapp-v1.15.0
     container_name: frontend-service
-    ports:
-      - "3000:3000"  # Maps host port 3000 to container port 3000
+    expose:
+      - "3000"  # Changed from ports to expose
     networks:
       - app-network
     depends_on:
       - backend
       - postgres
     environment:
-      - NEXT_PUBLIC_BACKEND_URL=http://backend:8080
-      - NEXT_PUBLIC_WEBSOCKET_URL=ws://backend:8080
+      - NEXT_PUBLIC_BACKEND_URL=http://54.208.12.34/api
+      - NEXT_PUBLIC_WEBSOCKET_URL=ws://54.208.12.34/api
+      - NEXT_PUBLIC_FRONTEND_URL=http://54.208.12.34
 
   backend:
-    image: capstone910/healthcare-workflow:api-v1.11.0  # Private repo for backend
+    image: capstone910/healthcare-workflow:api-v1.15.0
     container_name: backend-service
-    ports:
-      - "8080:8080"  # Maps host port 8080 to container port 8080
+    expose:
+      - "8080"  # Changed from ports to expose
     networks:
       - app-network
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     environment:
-           - DB_URL=jdbc:postgresql://postgres:5432/postgres
-           - ADMIN_URL:http://frontend:3000/app/admin
-           - USER_URL:http://frontend:3000/app/consultshistory
-           - LOGIN_URL:http://backend:8080/login
-           - FRONTEND_CORS_ORIGIN=http://localhost:3000
+      - DB_URL=jdbc:postgresql://postgres:5432/postgres
+      - ADMIN_URL=http://54.208.12.34/admin
+      - USER_URL=http://54.208.12.34/consultshistory
+      - LOGIN_URL=http://54.208.12.34/login
+      - FRONTEND_CORS_ORIGIN=http://54.208.12.34
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/postgres
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=MyAsh1122
+      - SPRING_LIQUIBASE_URL=jdbc:postgresql://postgres:5432/postgres
+      - SPRING_LIQUIBASE_USER=postgres
+      - SPRING_LIQUIBASE_PASSWORD=MyAsh1122
+      - SPRING_LIQUIBASE_CHANGE_LOG=classpath:db/changelog/db.changelog-master.xml
+    restart: unless-stopped
 
   postgres:
-    image: postgres:latest  # Public repo for PostgreSQL
+    image: postgres:latest
     container_name: postgres-service
     environment:
-      POSTGRES_DB: postgres               # You can change this if needed
-      POSTGRES_USER: postgres         # Matches your application.properties file
-      POSTGRES_PASSWORD: Postgresql   # Matches your application.properties file
-    ports:
-      - "5432:5432"  # Maps host port 5432 to container port 5432
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: MyAsh1122
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    expose:
+      - "5432"
     networks:
       - app-network
     volumes:
-      - postgres_data:/var/lib/postgresql/data  # Persistent volume for PostgreSQL data
+      - postgres_data:/var/lib/postgresql/data
+
+  caddy:
+    image: capstone910/latest:525cf2146ed9
+    container_name: caddy-service
+    ports:
+      - "80:80"
+      - "443:443"  # Added for HTTPS
+    networks:
+      - app-network
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data  # For SSL certificates
+      - caddy_config:/config
+    depends_on:
+      - frontend
+      - backend
+    restart: unless-stopped
 
 networks:
   app-network:
@@ -109,4 +141,7 @@ networks:
 volumes:
   postgres_data:
     driver: local
-
+  caddy_data:  # Added for Caddy SSL certificates
+    driver: local
+  caddy_config:  # Added for Caddy configuration
+    driver: local

@@ -1,5 +1,6 @@
 package com.example.demo.config
 import jakarta.annotation.PostConstruct
+import jakarta.servlet.http.HttpServletResponse
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -28,15 +29,12 @@ class SecurityConfig(private val dataSource: DataSource) {
 
     private val logger = LoggerFactory.getLogger(SecurityConfig::class.java)
 
-    init {
-        logger.info("SecurityConfig is initialized")
-    }
     @Value("\${frontend.cors-origin}")
     private lateinit var frontendCorsOrigin: String
-    //    @PostConstruct
-//    fun postConstruct() {
-//        logger.info("SecurityConfig has been fully initialized")
-//    }
+
+    @Value("\${backend.login-url}")
+    private lateinit var loginUrl: String
+
     @Bean
     fun customAuthenticationSuccessHandler(): CustomAuthenticationSuccessHandler {
         return CustomAuthenticationSuccessHandler()
@@ -46,46 +44,52 @@ class SecurityConfig(private val dataSource: DataSource) {
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http
             .csrf { it.disable() }
+            .cors { } // Enable CORS using the corsConfigurer below
             .authorizeHttpRequests { auth ->
                 auth
-                    .requestMatchers("/login", "/api/check-auth","/home").permitAll()
+                    .requestMatchers("/login", "/api/check-auth", "/home", "/api/**").permitAll()
                     .requestMatchers("/admin", "/api/users").hasRole("ADMIN")
-                    .requestMatchers("/api/consult/history").authenticated()
-                    .requestMatchers("/api/consult/letter").authenticated()
-                    .requestMatchers("/api/consult/summary").authenticated()
-                    .requestMatchers("/api/consult/new-session").authenticated()
-                    .requestMatchers("/api/consult/{uuid}/save").authenticated()
-                    .requestMatchers("/api/consult/{uuid}/generate-summary").authenticated()
+                    .requestMatchers("/api/consult/**").authenticated()
                     .requestMatchers("/deepgram-proxy").permitAll()
-
-
                     .anyRequest().authenticated()
             }
             .formLogin { form ->
                 form
-                    .loginPage("/login")
+                    .loginPage(loginUrl)
                     .loginProcessingUrl("/login")
-                    //.defaultSuccessUrl("/home", true)
                     .defaultSuccessUrl("/record", true)
                     .successHandler(customAuthenticationSuccessHandler())
-                    .failureUrl("/login?error=true")
+                    .failureUrl("$loginUrl?error=true")
                     .permitAll()
             }
-            .httpBasic { }
+            .exceptionHandling {
+                it.authenticationEntryPoint { request, response, authException ->
+                    logger.debug("Authentication required for: ${request.requestURI}")
+                    if (request.requestURI.startsWith("/api/")) {
+                        response.apply {
+                            setHeader("Access-Control-Allow-Origin", frontendCorsOrigin)
+                            setHeader("Access-Control-Allow-Credentials", "true")
+                            sendError(HttpServletResponse.SC_UNAUTHORIZED)
+                        }
+                    } else {
+                        response.sendRedirect(loginUrl)
+                    }
+                }
+            }
 
         return http.build()
     }
-
 
     @Bean
     fun corsConfigurer(): WebMvcConfigurer {
         return object : WebMvcConfigurer {
             override fun addCorsMappings(registry: CorsRegistry) {
                 registry.addMapping("/**")
-                    .allowedOrigins(frontendCorsOrigin)  // Allow requests from Next.js app
+                    .allowedOrigins(frontendCorsOrigin)
                     .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                     .allowedHeaders("*")
                     .allowCredentials(true)
+                    .maxAge(3600)
             }
         }
     }
@@ -98,19 +102,8 @@ class SecurityConfig(private val dataSource: DataSource) {
         val userQuery = "select username, password, enabled from users where username=?"
         val authQuery = "select username, authority from authorities where username=?"
 
-        logger.debug("Setting user query: $userQuery")
         users.setUsersByUsernameQuery(userQuery)
-
-        logger.debug("Setting authorities query: $authQuery")
         users.setAuthoritiesByUsernameQuery(authQuery)
-
-//        // Test the UserDetailsManager
-//        try {
-//            val testUser = users.loadUserByUsername("admin")
-//            logger.debug("Test user loaded successfully: ${testUser.username}")
-//        } catch (e: Exception) {
-//            logger.error("Failed to load test user", e)
-//        }
 
         return users
     }
@@ -120,6 +113,4 @@ class SecurityConfig(private val dataSource: DataSource) {
 
     @Bean
     fun uuidGenerator(): java.util.function.Supplier<UUID> = java.util.function.Supplier { UUID.randomUUID() }
-
-
 }

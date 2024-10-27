@@ -1,5 +1,6 @@
 package com.example.demo
 
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
@@ -8,7 +9,10 @@ import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.*
 
 @Controller
-class HomeController {
+class HomeController(
+    @Value("\${REACT_APP_FRONTEND_URL}") val frontendUrl: String
+) {
+
 
     @GetMapping("/home")
     fun home(model: Model): String {
@@ -29,12 +33,12 @@ class HomeController {
 
     @GetMapping("/admin")
     fun registrationPage(): String {
-        return "redirect:http://localhost:3000/admin"
+        return "redirect:$frontendUrl/admin"
     }
 
     @GetMapping("/record")
     fun recordPage(): String {
-        return "redirect:http://localhost:3000/record"
+        return "redirect:$frontendUrl/record"
     }
 
     @GetMapping("/api/check-auth")
@@ -45,7 +49,7 @@ class HomeController {
 
     @GetMapping("/transcribe")
     fun transcribePage(): String {
-        return "redirect:http://localhost:3000/transcribe"
+        return "redirect:http://$frontendUrl/transcribe"
     }
 
 //@RestController

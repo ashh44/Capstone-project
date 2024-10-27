@@ -13,31 +13,22 @@ import java.io.IOException
 @Component
 class CustomAuthenticationSuccessHandler : AuthenticationSuccessHandler {
 
-    @Value("\${frontend.admin-url}")
-    private lateinit var adminUrl: String
+    @Value("\${frontend.cors-origin}")
+    private lateinit var frontendUrl: String
 
-    @Value("\${frontend.user-url}")
-    private lateinit var userUrl: String
-
-    @Value("\${backend.login-url}")
-    private lateinit var loginUrl: String
-
-    @Throws(IOException::class, ServletException::class)
     override fun onAuthenticationSuccess(
-        request: HttpServletRequest?,
-        response: HttpServletResponse?,
-        authentication: Authentication?
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+        authentication: Authentication
     ) {
+        response.addHeader("Access-Control-Allow-Origin", frontendUrl)
+        response.addHeader("Access-Control-Allow-Credentials", "true")
+
         when {
-            authentication?.authorities?.contains(SimpleGrantedAuthority("ROLE_ADMIN")) == true -> {
-                response?.sendRedirect(adminUrl)
-            }
-            authentication?.authorities?.contains(SimpleGrantedAuthority("ROLE_USER")) == true -> {
-                response?.sendRedirect(userUrl)
-            }
-            else -> {
-                response?.sendRedirect(loginUrl)
-            }
+            authentication.authorities.any { it.authority == "ROLE_ADMIN" } ->
+                response.sendRedirect("$frontendUrl/admin")
+            else ->
+                response.sendRedirect("$frontendUrl/record")
         }
     }
 }

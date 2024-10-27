@@ -1,0 +1,18 @@
+:80 {
+    # Handle frontend routes
+    handle /* {
+        reverse_proxy frontend-service:3000
+    }
+
+    # Handle API routes
+    handle /api/* {
+        reverse_proxy backend-service:8080
+    }
+
+    # Enable logging
+    log {
+        output stdout
+        format console
+        level INFO
+    }
+}

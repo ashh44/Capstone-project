@@ -27,9 +27,9 @@ liquibase {
 		register("main") {
 			this.arguments = mapOf(
 				"changeLogFile" to "src/main/resources/db/changelog/master.sql",
-				"url" to "jdbc:postgresql://localhost:5432/postgres",
+				"url" to "jdbc:postgresql://postgres:5432/postgres",
 				"username" to "postgres",
-				"password" to "pass"
+				"password" to "MyAsh1122"
 			)
 		}
 	}

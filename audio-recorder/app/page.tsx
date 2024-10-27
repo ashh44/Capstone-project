@@ -14,10 +14,11 @@ export default function Record() {
   useEffect(() => {
     checkAuth();
   }, []);
-
+const apiBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://54.208.12.34/api';
+  const frontendUrl = process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://54.208.12.34';
   const checkAuth = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/check-auth', {
+      const response = await fetch(`${apiBaseUrl}/check-auth`, {
         method: 'GET',
         credentials: 'include',
       });
@@ -26,14 +27,14 @@ export default function Record() {
         if (data.authenticated) {
           setIsAuthenticated(true);
         } else {
-          window.location.href = 'http://localhost:8080/login';
+          window.location.href = `${frontendUrl}/login`;
         }
       } else {
-        window.location.href = 'http://localhost:8080/login';
+        window.location.href = `${frontendUrl}/login`;
       }
     } catch (error) {
       console.error('Error checking authentication:', error);
-      window.location.href = 'http://localhost:8080/login';
+      window.location.href = `${frontendUrl}/login`;
     }
   };
 

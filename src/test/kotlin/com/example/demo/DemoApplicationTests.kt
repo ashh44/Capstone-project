@@ -8,8 +8,5 @@ import org.springframework.test.context.web.WebAppConfiguration
 @WebAppConfiguration
 class DemoApplicationTests {
 
-	@Test
-	fun contextLoads() {
-	}
 
 }

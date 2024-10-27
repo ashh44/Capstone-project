@@ -24,7 +24,7 @@ const LiveTranscription: React.FC = () => {
       scriptProcessorRef.current = scriptProcessor;
 
       // Open the WebSocket connection
-      const webSocketUrl = process.env.NEXT_PUBLIC_WEBSOCKET_URL || 'ws://localhost:8080';
+      const webSocketUrl = process.env.NEXT_PUBLIC_WEBSOCKET_URL || 'ws://54.208.12.34/api';
       socketRef.current = new WebSocket(`${webSocketUrl}/deepgram-proxy`);
       socketRef.current.onopen = () => {
         console.log('WebSocket connection opened');
