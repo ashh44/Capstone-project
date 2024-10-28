@@ -55,7 +55,7 @@ const UserHistory: React.FC = () => {
   };
 
   const handleDownload = (sessionId: string, type: 'summary' | 'letter') => {
-    const downloadUrl = `http://localhost:8080/api/consult/${sessionId}/download-${type}`;
+    const downloadUrl = `${backendUrl}/api/consult/${sessionId}/download-${type}`;
     window.open(downloadUrl, "_blank");
   };
 
