@@ -1,6 +1,6 @@
 "use client";
 
-//user history
+// User history
 
 import React, { useState, useEffect, useContext } from 'react';
 import { useRouter } from 'next/navigation';
@@ -11,6 +11,7 @@ interface HistoryRecord {
   creationTime: string;
   summary: string;
   letter: string;
+  username: string;
 }
 
 const UserHistory: React.FC = () => {
@@ -53,8 +54,8 @@ const UserHistory: React.FC = () => {
     router.push('/record');
   };
 
-  const handleDownload = (sessionId: string) => {
-    const downloadUrl = `http://localhost:8080/api/consult/${sessionId}/download`;
+  const handleDownload = (sessionId: string, type: 'summary' | 'letter') => {
+    const downloadUrl = `http://localhost:8080/api/consult/${sessionId}/download-${type}`;
     window.open(downloadUrl, "_blank");
   };
 
@@ -63,35 +64,67 @@ const UserHistory: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-blue-900 flex flex-col items-center justify-center">
-      <div className="bg-white p-8 rounded-lg shadow-lg max-w-2xl w-full text-center">
-        <h1 className="text-4xl font-bold text-gray-800 mb-6">User History</h1>
-        <p className="text-gray-600 mb-4">Welcome, {username}</p>
+    <div className="min-h-screen bg-blue-100 flex flex-col items-center justify-start">
+      {/* Header with Logo, Navigation Links, and Button */}
+      <header className="w-full max-w-6xl bg-blue-900 flex justify-between items-center sticky top-0 z-50 shadow-lg p-4">
+        {/* Logo Section */}
+        <div className="flex items-center space-x-3">
+          <img src="/facere-logo.svg" alt="Company Logo" className="h-10" />
+          <span className="text-white font-bold text-lg"></span>
+        </div>
+
+        {/* Navigation Links */}
+        <nav className="space-x-6 text-white hidden md:flex">
+          <a href="localhost:8080/login" className="hover:underline">Home</a>
+          <a href="https://facere.ai/blog" className="hover:underline">News</a>
+          <a href="https://facere.ai/faq" className="hover:underline">FAQ</a>
+        </nav>
+
+        {/* "Go to Record Page" Button */}
+        <button
+          onClick={handleGoToRecord}
+          className="bg-blue-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none"
+        >
+          Go to Record Page
+        </button>
+      </header>
+
+      {/* Main Content */}
+      <div className="bg-white p-8 rounded-lg shadow-lg max-w-4xl w-full text-center mt-6">
+        <h1 className="text-4xl font-bold text-gray-800 mb-2">Your Previous History</h1>
+        <p className="text-gray-600 mb-6 text-lg">Welcome, {username || 'User'}</p>
 
         {history.length === 0 ? (
           <p className="text-gray-600 mb-4">No records found</p>
         ) : (
-          <table className="min-w-full bg-white mb-6">
-            <thead>
+          <table className="min-w-full bg-white mb-6 rounded-lg overflow-hidden shadow-sm">
+            <thead className="bg-gray-200">
               <tr>
-                <th className="py-2">Creation Time</th>
-                <th className="py-2">Summary</th>
-                <th className="py-2">Letter</th>
-                <th className="py-2">Download</th>
+                <th className="py-4 px-6 text-left text-gray-700 font-semibold">Last Visit</th>
+                <th className="py-4 px-6 text-left text-gray-700 font-semibold">Summary</th>
+                <th className="py-4 px-6 text-left text-gray-700 font-semibold">Letter</th>
               </tr>
             </thead>
             <tbody>
               {history.map((record, index) => (
-                <tr key={index} className="text-center">
-                  <td className="py-2">{new Date(record.creationTime).toLocaleString()}</td>
-                  <td className="py-2">{record.summary || 'N/A'}</td>
-                  <td className="py-2">{record.letter || 'N/A'}</td>
-                  <td className="py-2">
+                <tr key={index} className="text-center border-t">
+                  <td className="py-4 px-6 text-gray-700">
+                    {new Date(record.creationTime).toLocaleString()}
+                  </td>
+                  <td className="py-4 px-6">
                     <button
-                      className="bg-blue-500 text-white px-4 py-2 rounded"
-                      onClick={() => handleDownload(record.sessionId)}
+                      className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none"
+                      onClick={() => handleDownload(record.sessionId, 'summary')}
                     >
-                      Download
+                      Download Summary PDF
+                    </button>
+                  </td>
+                  <td className="py-4 px-6">
+                    <button
+                      className="bg-green-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-600 focus:outline-none"
+                      onClick={() => handleDownload(record.sessionId, 'letter')}
+                    >
+                      Download Letter PDF
                     </button>
                   </td>
                 </tr>
@@ -99,13 +132,6 @@ const UserHistory: React.FC = () => {
             </tbody>
           </table>
         )}
-
-        <button
-          onClick={handleGoToRecord}
-          className="w-full bg-indigo-500 text-white py-2 px-4 rounded-lg hover:bg-indigo-600 focus:outline-none focus:bg-indigo-600"
-        >
-          Go to Record Page
-        </button>
       </div>
     </div>
   );
