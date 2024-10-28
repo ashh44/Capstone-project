@@ -115,8 +115,8 @@ const LiveTranscription: React.FC = () => {
       <button
         onClick={handleStartStop}
         className={`w-full py-3 mb-4 text-white font-semibold rounded-lg ${
-          isTranscribing ? 'bg-red-500 hover:bg-red-700' : 'bg-green-500 hover:bg-green-700'
-        }`}
+          isTranscribing ? 'bg-red-500 hover:bg-red-700' : 'bg-teal-500 hover:bg-teal-700'
+        } flex items-center justify-center space-x-2`}
       >
         {isTranscribing ? 'Stop Transcription' : 'Start Transcription'}
       </button>
