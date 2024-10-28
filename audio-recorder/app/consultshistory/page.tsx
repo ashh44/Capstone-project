@@ -26,7 +26,7 @@ const UserHistory: React.FC = () => {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080';
+        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://54.208.12.34/api';
         const response = await fetch(`${backendUrl}/api/consult/history`, {
           method: 'GET',
           headers: {
