@@ -7,80 +7,190 @@
   <style>
     body {
         font-family: 'Arial', sans-serif;
-        background: #f7f7f7;
         margin: 0;
         padding: 0;
+        height: 100vh;
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 100vh;
+        background: linear-gradient(to bottom, #1e3a8a 70%, #ffffff 30%);
+        position: relative;
     }
 
-    .login-container {
-        background: #fff;
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0px 0px 10px 0px #0000001a;
-        width: 300px;
+
+    .header {
+        position: absolute;
+        top: 10px;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        padding: 0 20px;
+    }
+
+    .header img {
+        height: 40px;
+    }
+
+    .header .project-title {
+        color: #ffffff;
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+  .header-links {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+   }
+
+  .know-us-better {
+    font-size: 14px;
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.know-us-better:hover {
+    color: #FFD700;
+}
+
+.curved-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #1e3a8a;
+    clip-path: ellipse(75% 60% at 50% 30%);
+    z-index: -1;
+}
+    .container {
+        display: flex;
+        width: 800px;
+        height: 500px;
+        background: #1e3a8a;
+        border-radius: 15px;
+        box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+    }
+
+    .login-section, .signup-section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 40px;
+    }
+
+    .login-section {
+        background: #ffffff;
+    }
+
+    .signup-section {
+        background: linear-gradient(to bottom right, #1e3a8a, #2563eb);
+        color: #ffffff;
         text-align: center;
     }
 
-    .login-container h2 {
+    .login-section h2 {
         margin-bottom: 20px;
-        font-size: 24px;
+        font-size: 28px;
         color: #333;
     }
 
-    .login-container input[type="text"],
-    .login-container input[type="password"] {
+    .signup-section h2 {
+        font-size: 24px;
+        margin-bottom: 15px;
+    }
+
+    .login-section input[type="text"],
+    .login-section input[type="password"] {
         width: 100%;
-        padding: 10px;
+        padding: 12px;
         margin: 10px 0;
         border: 1px solid #ccc;
         border-radius: 5px;
+        font-size: 16px;
     }
 
-    .login-container button {
+    .login-section button {
         width: 100%;
-        padding: 10px;
-        background: #007bff;
+        padding: 12px;
+        background: #2563eb;
         border: none;
         border-radius: 5px;
         color: #fff;
-        font-size: 16px;
+        font-size: 18px;
         cursor: pointer;
         transition: background 0.3s ease;
     }
 
-    .login-container button:hover {
-        background: #0056b3;
+    .login-section button:hover {
+        background: #1d4ed8;
     }
 
-    .login-container .forgot-password {
+   .login-container .forgot-password {
         margin-top: 15px;
         font-size: 14px;
     }
 
-    .login-container .forgot-password a {
-        color: #007bff;
-        text-decoration: none;
+
+    .divider {
+        margin: 20px 0;
+        color: #666;
+        display: flex;
+        align-items: center;
     }
 
-    .login-container .forgot-password a:hover {
-        text-decoration: underline;
+    .divider::before,
+    .divider::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: #ccc;
+        margin: 0 10px;
     }
   </style>
+
+  </script>
 </head>
 <body>
-<div class="login-container">
-  <h2>Login</h2>
-  <form th:action="@{/login}" method="post">
-    <input type="text" id="username" name="username" placeholder="Username" required />
-    <input type="password" id="password" name="password" placeholder="Password" required />
-    <button type="submit">Sign in</button>
-  </form>
-  <div class="forgot-password">
-    <a href="#">Forgot your password?</a>
+
+<div class="header">
+  <img src="/facere-logo.svg" alt="Company Logo" >
+
+  <div class="header-links">
+    <a href="https://facere.ai/" target="_blank" class="know-us-better">Know Us Better</a>
+    <div class="project-title">CS9 Capstone Project</div>
+  </div>
+</div>
+
+
+
+<div class="container">
+  <!-- Login Section -->
+  <div class="login-section">
+    <h2>Login to Your Account</h2>
+    <div class="social-login">
+    </div>
+    <div class="divider"></div>
+    <form th:action="@{/login}" method="post" onsubmit="return validatePassword()">
+      <input type="text" id="username" name="username" placeholder="Username" required />
+      <input type="password" id="password" name="password" placeholder="Password" required />
+      <div id="error-message" class="error-message"></div>
+      <button type="submit">Sign In</button>
+    </form>
+
+  </div>
+
+  <div class="curved-background"></div>
+
+  <div class="signup-section">
+    <h2>Facere: We make your work simple. </h2>
+    <p>We create AI-powered workflow automation software that integrates seamlessly into existing health workflows. Our solution holds the potential to revolutionise the health industry, empowering health care workers to deliver better care to more people.</p>
+
   </div>
 </div>
 </body>
