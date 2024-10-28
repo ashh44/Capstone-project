@@ -73,14 +73,14 @@ const UserHistory: React.FC = () => {
           <span className="text-white font-bold text-lg"></span>
         </div>
 
-        {/* Navigation Links */}
+       
         <nav className="space-x-6 text-white hidden md:flex">
-          <a href="localhost:8080/login" className="hover:underline">Home</a>
+          <a href="#" className="hover:underline">Home</a>
           <a href="https://facere.ai/blog" className="hover:underline">News</a>
           <a href="https://facere.ai/faq" className="hover:underline">FAQ</a>
         </nav>
 
-        {/* "Go to Record Page" Button */}
+       
         <button
           onClick={handleGoToRecord}
           className="bg-blue-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none"
