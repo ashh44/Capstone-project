@@ -2,52 +2,55 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { FiMic, FiSave, FiFileText } from 'react-icons/fi'; // Import icons
+import { ClipLoader } from 'react-spinners'; // For loading spinner
+
 
 export default function Record() {
   const [isRecording, setIsRecording] = useState(false);
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
   const [audioSource, setAudioSource] = useState<MediaStreamAudioSourceNode | null>(null);
   const scriptNodeRef = useRef<ScriptProcessorNode | null>(null);
-  const chunkBuffer = useRef<Float32Array[]>([]); // Buffer for audio chunks
-  const [sessionId, setSessionId] = useState<string | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
+  const chunkBuffer = useRef<Float32Array[]>([]);
+  const [sessionId, setSessionId] = useState<string | null>(null); // Store the session ID (UUID)
+  const [isSaving, setIsSaving] = useState(false); // State to manage saving/loading
+  const [isGenerating, setIsGenerating] = useState(false); // State to manage summary generation
   const [error, setError] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const apiBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://54.208.12.34/api';
-  const frontendUrl = process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://54.208.12.34';
+   const frontendUrl = process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://54.208.12.34';
 
-  // Authentication check
-  useEffect(() => {
-    checkAuth();
-  }, []);
+   // Authentication check
+     useEffect(() => {
+       checkAuth();
+     }, []);
 
-  const checkAuth = async () => {
-    try {
-      const response = await fetch(`${apiBaseUrl}/check-auth`, {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          'Accept': 'application/json',
-        }
-      });
+ const checkAuth = async () => {
+     try {
+       const response = await fetch(`${apiBaseUrl}/check-auth`, {
+         method: 'GET',
+         credentials: 'include',
+         headers: {
+           'Accept': 'application/json',
+         }
+       });
 
-      if (response.ok) {
-        const data = await response.json();
-        if (data.authenticated) {
-          setIsAuthenticated(true);
-        } else {
-          window.location.href = `${frontendUrl}/login`;
-        }
-      } else {
-        window.location.href = `${frontendUrl}/login`;
-      }
-    } catch (error) {
-      console.error('Auth check error:', error);
-      window.location.href = `${frontendUrl}/login`;
-    }
-  };
+       if (response.ok) {
+         const data = await response.json();
+         if (data.authenticated) {
+           setIsAuthenticated(true);
+         } else {
+           window.location.href = `${frontendUrl}/login`;
+         }
+       } else {
+         window.location.href = `${frontendUrl}/login`;
+       }
+     } catch (error) {
+       console.error('Auth check error:', error);
+       window.location.href = `${frontendUrl}/login`;
+     }
+   };
 
   useEffect(() => {
     if (isRecording) {
@@ -58,9 +61,10 @@ export default function Record() {
           const audioCtx = new AudioContext({ sampleRate: 44100 });
           const source = audioCtx.createMediaStreamSource(stream);
 
-          const bufferSize = 4096;
+          const bufferSize = 4096; // Adjust buffer size if needed
           const scriptNode = audioCtx.createScriptProcessor(bufferSize, 1, 1);
 
+          // Log buffer processing
           scriptNode.onaudioprocess = (audioProcessingEvent: AudioProcessingEvent) => {
             const inputBuffer = audioProcessingEvent.inputBuffer.getChannelData(0);
             const inputData = new Float32Array(inputBuffer.length);
@@ -74,16 +78,15 @@ export default function Record() {
           setAudioContext(audioCtx);
           setAudioSource(source);
           scriptNodeRef.current = scriptNode;
-          setError(null);
         } catch (error) {
           console.error('Error accessing the microphone:', error);
-          setError('Unable to access microphone. Please check permissions.');
         }
       };
 
+      // Generate a UUID when recording starts
       const newSessionId = uuidv4();
-      setSessionId(newSessionId);
-      console.log('New recording session started:', newSessionId);
+            setSessionId(newSessionId);
+            console.log('New recording session started:', newSessionId);
 
       startRecording();
     } else {
@@ -115,16 +118,103 @@ export default function Record() {
     }
   };
 
+  const saveRecording = async () => {
+    if (chunkBuffer.current.length > 0 && sessionId) {
+      setIsSaving(true); // Start saving/loading
+
+      // Flatten the chunk buffer into a single Float32Array
+      const bufferLength = chunkBuffer.current.reduce((acc, buffer) => acc + buffer.length, 0);
+      const resultBuffer = new Float32Array(bufferLength);
+      let offset = 0;
+      for (let i = 0; i < chunkBuffer.current.length; i++) {
+        resultBuffer.set(chunkBuffer.current[i], offset);
+        offset += chunkBuffer.current[i].length;
+      }
+
+      // Convert the audio buffer to base64 and send to backend as .bin
+      const base64Audio = float32ToBase64(resultBuffer);
+      const payload = {
+        sessionId,
+        audioData: base64Audio,
+      };
+
+      try {
+        const response = await fetch(`${apiBaseUrl}/consult/${sessionId}/save`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+              userName: "",
+              audioData: base64Audio
+            }),
+            credentials: 'include',
+          });
+
+        if (response.ok) {
+          alert('Recording saved as .bin successfully.');
+        } else {
+          alert('Failed to save recording.');
+        }
+      } catch (error) {
+        console.error('Error saving recording:', error);
+      } finally {
+        setIsSaving(false); // Stop saving/loading state
+      }
+    }
+  };
+
+  const generateSummaryAndLetter = async () => {
+    setIsGenerating(true); // Start generating
+
+   console.log(`Making request to URL: ${apiBaseUrl}/consult/${sessionId}/generate-summary`);
+
+    try {
+      const response = await fetch(`${apiBaseUrl}/consult/${sessionId}/generate-summary`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+           // sessionId: sessionId,
+            //audioData: base64Audio,
+            userName: "",
+
+          }),
+      credentials: 'include',
+
+      });
+
+      if (response.ok) {
+      const responseData = await response.json();
+
+
+       const { sessionId, summary, letter } = responseData;
+
+       // Show the data in a popup window for debugging
+       alert(`Session ID: ${sessionId}\nSummary: ${summary}\nLetter: ${letter}`);
+
+       alert('Summary and letter generated successfully.');
+      } else {
+        alert('Failed to generate summary and letter.');
+      }
+    } catch (error) {
+      console.error('Error generating summary and letter:', error);
+    } finally {
+      setIsGenerating(false); // Stop generating state
+    }
+  };
+
   const float32ToBase64 = (float32Array: Float32Array) => {
     const int16Array = new Int16Array(float32Array.length);
     for (let i = 0; i < float32Array.length; i++) {
       int16Array[i] = Math.max(-1, Math.min(1, float32Array[i])) * 32767;
     }
 
-    const buffer = new ArrayBuffer(int16Array.length * 2);
+    const buffer = new ArrayBuffer(int16Array.length * 2); // 2 bytes per int16 sample
     const view = new DataView(buffer);
     for (let i = 0; i < int16Array.length; i++) {
-      view.setInt16(i * 2, int16Array[i], true);
+      view.setInt16(i * 2, int16Array[i], true); // true for little-endian
     }
 
     const bytes = new Uint8Array(buffer);
@@ -132,101 +222,10 @@ export default function Record() {
     for (let i = 0; i < bytes.byteLength; i++) {
       binary += String.fromCharCode(bytes[i]);
     }
-    return window.btoa(binary);
+    return window.btoa(binary); // Base64 encoding
   };
 
-  const saveRecording = async () => {
-    if (chunkBuffer.current.length > 0 && sessionId) {
-      setIsSaving(true);
-      setError(null);
-
-      try {
-        // Flatten the chunk buffer
-        const bufferLength = chunkBuffer.current.reduce((acc, buffer) => acc + buffer.length, 0);
-        const resultBuffer = new Float32Array(bufferLength);
-        let offset = 0;
-        for (const buffer of chunkBuffer.current) {
-          resultBuffer.set(buffer, offset);
-          offset += buffer.length;
-        }
-
-        const base64Audio = float32ToBase64(resultBuffer);
-        console.log('Saving recording for session:', sessionId);
-
-        const response = await fetch(`${apiBaseUrl}/consult/${sessionId}/save`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          },
-          body: JSON.stringify({
-            userName: "user5",
-            audioData: base64Audio
-          }),
-          credentials: 'include',
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          console.log('Recording saved successfully:', data);
-          alert('Recording saved successfully!');
-          chunkBuffer.current = []; // Clear the buffer after successful save
-        } else {
-          const errorData = await response.json().catch(() => null);
-          console.error('Save failed:', errorData);
-          setError(errorData?.message || 'Failed to save recording.');
-        }
-      } catch (error) {
-        console.error('Error saving recording:', error);
-        setError('An error occurred while saving the recording.');
-      } finally {
-        setIsSaving(false);
-      }
-    }
-  };
-
-  const generateSummaryAndLetter = async () => {
-    if (!sessionId) {
-      setError('No recording session available.');
-      return;
-    }
-
-    setIsGenerating(true);
-    setError(null);
-
-    try {
-      console.log('Generating summary for session:', sessionId);
-
-      const response = await fetch(`${apiBaseUrl}/consult/${sessionId}/generate-summary`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify({
-          userName: "user5"
-        }),
-        credentials: 'include',
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Summary generated:', data);
-        alert(`Summary and Letter Generated Successfully!\n\nSummary: ${data.summary}\n\nLetter: ${data.letter}`);
-      } else {
-        const errorData = await response.json().catch(() => null);
-        console.error('Generate failed:', errorData);
-        setError(errorData?.message || 'Failed to generate summary and letter.');
-      }
-    } catch (error) {
-      console.error('Error generating summary:', error);
-      setError('An error occurred while generating the summary.');
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
-  if (!isAuthenticated) {
+ if (!isAuthenticated) {
     return <div className="flex items-center justify-center h-screen">
       <div className="text-center">
         <h2 className="text-xl font-semibold mb-4">Checking authentication...</h2>
@@ -236,67 +235,62 @@ export default function Record() {
   }
 
   return (
-    <div className="min-h-screen bg-blue-900 flex flex-col justify-between">
+    <div className="min-h-screen bg-blue-900 flex flex-col justify-between text-white font-sans">
       <header className="w-full flex justify-between items-center px-6 py-4">
-        <img src="/facere-logo.svg" alt="Facere Logo" className="h-10" />
+        <img src="/facere-logo.svg" alt="Facere Logo" className="h-12" />
         <nav className="space-x-6">
-          <a href="/record" className="text-white hover:underline">Record</a>
-          <a href="/transcribe" className="text-white hover:underline">Live Transcribe</a>
-          <a href="#" className="text-white hover:underline">Solution</a>
-          <a href="#" className="text-white hover:underline">News</a>
-          <a href="#" className="text-white hover:underline">FAQ</a>
-          <a href="#" className="text-white hover:underline">About Us</a>
+          <a href="/consultshistory" className="hover:underline">Home</a>
+          <a href="/transcribe" className="hover:underline">Live Transcription</a>
+          <a href="https://facere.ai/blog" className="hover:underline">News</a>
+          <a href="https://facere.ai/faq" className="hover:underline">FAQ</a>
         </nav>
       </header>
 
       <main className="flex-grow flex items-center justify-center">
-        <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg text-center border-4 border-indigo-500">
-          <h1 className="text-4xl font-bold text-gray-800 mb-6">🎤 Audio Recorder</h1>
-
-          {error && (
-            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-              {error}
-            </div>
-          )}
+        <div className="bg-white bg-opacity-90 p-10 rounded-2xl shadow-2xl max-w-lg text-center border border-indigo-300">
+          <h1 className="text-5xl font-extrabold text-gray-800 mb-8 shadow-md">🎙️ Audio Recorder</h1>
 
           <button
             onClick={() => setIsRecording(!isRecording)}
-            className={`w-full py-3 mb-4 text-white font-semibold rounded-lg transition-all ${
-              isRecording ? 'bg-red-500 hover:bg-red-700' : 'bg-green-500 hover:bg-green-700'
-            }`}
+            className={`w-full py-3 mb-6 text-white font-bold rounded-lg transition-transform transform hover:scale-105 ${
+              isRecording ? 'bg-red-500 hover:bg-red-700' : 'bg-teal-500 hover:bg-teal-700'
+            } flex items-center justify-center space-x-2`}
           >
+            <FiMic className="inline-block text-2xl" />
             {isRecording ? 'Stop Recording' : 'Start Recording'}
           </button>
 
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 mb-8">
             {isRecording ? '🎙️ Recording in progress...' : 'Click the button to start recording'}
           </p>
 
           {!isRecording && sessionId && (
-            <div className="space-y-4">
+            <>
               <button
                 onClick={saveRecording}
+                className="w-full py-3 mb-6 text-white font-bold rounded-lg bg-indigo-500 hover:bg-indigo-600 flex items-center justify-center space-x-2"
                 disabled={isSaving}
-                className={`w-full py-3 text-white font-semibold rounded-lg transition-all ${
-                  isSaving ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-700'
-                }`}
               >
+                {isSaving ? <ClipLoader size={20} color={"#fff"} /> : <FiSave className="inline-block text-xl" />}
                 {isSaving ? 'Saving...' : 'Save Recording'}
               </button>
 
               <button
                 onClick={generateSummaryAndLetter}
+                className="w-full py-3 mb-6 text-white font-bold rounded-lg bg-indigo-500 hover:bg-indigo-600 flex items-center justify-center space-x-2"
                 disabled={isGenerating}
-                className={`w-full py-3 text-white font-semibold rounded-lg transition-all ${
-                  isGenerating ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-700'
-                }`}
               >
+                {isGenerating ? <ClipLoader size={20} color={"#fff"} /> : <FiFileText className="inline-block text-xl" />}
                 {isGenerating ? 'Generating...' : 'Generate Summary and Letter'}
               </button>
-            </div>
+            </>
           )}
         </div>
       </main>
+
+      <footer className="py-4 text-center text-sm bg-opacity-20">
+        <p>&copy; 2024 Facere Inc. All rights reserved.</p>
+      </footer>
     </div>
   );
 }
