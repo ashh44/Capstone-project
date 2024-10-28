@@ -68,7 +68,7 @@ dependencies {
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
 	testImplementation("org.springframework.security:spring-security-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-
+        implementation( "org.apache.pdfbox:pdfbox:2.0.27")
 	implementation("com.squareup.okhttp3:okhttp:4.9.3")
 	implementation("org.json:json:20211205")
 	implementation("com.google.code.gson:gson:2.10.1")
