@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { FiMic, FiSave, FiFileText } from 'react-icons/fi'; // Import icons
-import { ClipLoader } from 'react-spinners'; // For loading spinner
+import { FiMic, FiSave, FiFileText } from 'react-icons/fi'; // npm install react-icons
+import { ClipLoader } from 'react-spinners'; // npm install react-spinners
+
 
 
 export default function Record() {
