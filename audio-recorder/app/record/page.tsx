@@ -18,9 +18,8 @@ export default function Record() {
   const [isGenerating, setIsGenerating] = useState(false); // State to manage summary generation
   const [error, setError] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  const apiBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://54.208.12.34/api';
-   const frontendUrl = process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://54.208.12.34';
+  const apiBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080/api';
+  const frontendUrl = process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000';
 
    // Authentication check
      useEffect(() => {

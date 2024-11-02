@@ -9,8 +9,9 @@ const RegisterForm: React.FC = () => {
     const [messageType, setMessageType] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
-    const apiBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://54.208.12.34/api';
-    const frontendUrl = process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://54.208.12.34';
+    const apiBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080/api';
+    const loginUrl = process.env.NEXT_PUBLIC_LOGIN_URL || 'http://localhost:8080';
+    const frontendUrl = process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000';
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
@@ -48,7 +49,7 @@ const RegisterForm: React.FC = () => {
 
                 // Redirect to login page after successful registration
                 setTimeout(() => {
-                    window.location.href = `${frontendUrl}/login`;
+                    window.location.href = `${loginUrl}/login`;
                 }, 2000);
             } else {
                 const errorData = await response.json().catch(() => null);

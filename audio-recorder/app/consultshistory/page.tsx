@@ -22,12 +22,12 @@ const UserHistory: React.FC = () => {
   // Safely access the UserContext
   const userContext = useContext(UserContext);
   const username = userContext?.username ?? 'User';
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080/api';
 
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://54.208.12.34/api';
-        const response = await fetch(`${backendUrl}/api/consult/history`, {
+        const response = await fetch(`${backendUrl}/consult/history`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -55,7 +55,7 @@ const UserHistory: React.FC = () => {
   };
 
   const handleDownload = (sessionId: string, type: 'summary' | 'letter') => {
-    const downloadUrl = `${backendUrl}/api/consult/${sessionId}/download-${type}`;
+    const downloadUrl = `${backendUrl}/consult/${sessionId}/download-${type}`;
     window.open(downloadUrl, "_blank");
   };
 
@@ -73,14 +73,14 @@ const UserHistory: React.FC = () => {
           <span className="text-white font-bold text-lg"></span>
         </div>
 
-       
+
         <nav className="space-x-6 text-white hidden md:flex">
           <a href="#" className="hover:underline">Home</a>
           <a href="https://facere.ai/blog" className="hover:underline">News</a>
           <a href="https://facere.ai/faq" className="hover:underline">FAQ</a>
         </nav>
 
-       
+
         <button
           onClick={handleGoToRecord}
           className="bg-blue-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none"

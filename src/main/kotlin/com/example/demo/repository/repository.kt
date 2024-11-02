@@ -14,3 +14,4 @@ interface UserRepository : JpaRepository<User, String>
 interface ConsultHistoryRepository : JpaRepository<ConsultHistory, UUID> {
     fun findByUserName(userName: String): List<ConsultHistory>
 }
+

@@ -1,138 +1,64 @@
-## Comments are provided throughout this file to help you get started.
-## If you need more help, visit the Docker Compose reference guide at
-## https://docs.docker.com/go/compose-spec-reference/
-#
-## Here the instructions define your application as a service called "server".
-## This service is built from the olddock in the current directory.
-## You can add other services your application may depend on here, such as a
-## database or a cache. For examples, see the Awesome Compose repository:
-## https://github.com/docker/awesome-compose
-#version: '3.8'
-#
-#services:
-#  app:
-#    build: .
-#    ports:
-#      - "8081:8080"
-#    image: "convert-audio"
-#    env_file:
-#      - .env
-#    environment:
-#      - SPRING_PROFILES_ACTIVE=default
-#      - DEEPGRAM_API_KEY=${DEEPGRAM_API_KEY}
-#      - OPENAI_API_KEY=${OPENAI_API_KEY}
-#
-## The commented out section below is an example of how to define a PostgreSQL
-## database that your application can use. `depends_on` tells Docker Compose to
-## start the database before your application. The `db-data` volume persists the
-## database data between container restarts. The `db-password` secret is used
-## to set the database password. You must create `db/password.txt` and add
-## a password of your choosing to it before running `docker-compose up`.
-##     depends_on:
-##       db:
-##         condition: service_healthy
-##   db:
-##     image: postgres
-##     restart: always
-##     user: postgres
-##     secrets:
-##       - db-password
-##     volumes:
-##       - db-data:/var/lib/postgresql/data
-##     environment:
-##       - POSTGRES_DB=example
-##       - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
-##     expose:
-##       - 5432
-##     healthcheck:
-##       test: [ "CMD", "pg_isready" ]
-##       interval: 10s
-##       timeout: 5s
-##       retries: 5
-## volumes:
-##   db-data:
-## secrets:
-##   db-password:
-##     file: db/password.txt
-#============================================================
 version: '3'
 
 services:
   frontend:
-    image: capstone910/healthcare-workflow:webapp-v1.15.0
+    image: capstone910/healthcare-workflow:webapp-v2.3.0
     container_name: frontend-service
-    expose:
-      - "3000"  # Changed from ports to expose
+    ports:
+      - "3000:3000"  # Maps host port 3000 to container port 3000
     networks:
       - app-network
     depends_on:
       - backend
       - postgres
     environment:
-      - NEXT_PUBLIC_BACKEND_URL=http://54.208.12.34/api
-      - NEXT_PUBLIC_WEBSOCKET_URL=ws://54.208.12.34/api
-      - NEXT_PUBLIC_FRONTEND_URL=http://54.208.12.34
+      - NODE_ENV=production
+      - NEXT_PUBLIC_BACKEND_URL=http://3.106.13.250/api
+      - NEXT_PUBLIC_LOGIN_URL=http://3.106.13.250
+      - NEXT_PUBLIC_FRONTEND_URL=http://3.106.13.250
+      - NEXT_PUBLIC_WEBSOCKET_URL=ws://3.106.13.250
+    command: "sh -c 'sleep 5 && npm run build && npm start'"
 
   backend:
-    image: capstone910/healthcare-workflow:api-v1.15.0
+    image: capstone910/healthcare-workflow:api-v2.3.0
     container_name: backend-service
-    expose:
-      - "8080"  # Changed from ports to expose
+    ports:
+      - "8080:8080"  # Maps host port 8080 to container port 8080
     networks:
       - app-network
     depends_on:
-      postgres:
-        condition: service_healthy
+      - postgres
     environment:
+      - USER_URL=http://3.106.13.250/consultshistory
       - DB_URL=jdbc:postgresql://postgres:5432/postgres
-      - ADMIN_URL=http://54.208.12.34/admin
-      - USER_URL=http://54.208.12.34/consultshistory
-      - LOGIN_URL=http://54.208.12.34/login
-      - FRONTEND_CORS_ORIGIN=http://54.208.12.34
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/postgres
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=MyAsh1122
-      - SPRING_LIQUIBASE_URL=jdbc:postgresql://postgres:5432/postgres
-      - SPRING_LIQUIBASE_USER=postgres
-      - SPRING_LIQUIBASE_PASSWORD=MyAsh1122
-      - SPRING_LIQUIBASE_CHANGE_LOG=classpath:db/changelog/db.changelog-master.xml
-    restart: unless-stopped
+      - ADMIN_URL=http://3.106.13.250/admin
+      - LOGIN_URL=http://3.106.13.250/login
+      - FRONTEND_CORS_ORIGIN=http://3.106.13.250
 
   postgres:
     image: postgres:latest
     container_name: postgres-service
     environment:
       POSTGRES_DB: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: MyAsh1122
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    expose:
-      - "5432"
+      POSTGRES_USER: postgres         # Matches your application.properties file
+      POSTGRES_PASSWORD: Postgresql   # Matches your application.properties file
+    ports:
+      - "5432:5432"  # Maps host port 5432 to container port 5432
     networks:
       - app-network
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data  # Persistent volume for PostgreSQL data
 
   caddy:
-    image: capstone910/latest:525cf2146ed9
+    image: caddy:latest
     container_name: caddy-service
     ports:
       - "80:80"
-      - "443:443"  # Added for HTTPS
     networks:
       - app-network
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
-      - caddy_data:/data  # For SSL certificates
-      - caddy_config:/config
-    depends_on:
-      - frontend
-      - backend
-    restart: unless-stopped
+      - /home/ec2-user/Caddyfile:/etc/caddy/Caddyfile  # Correct path to Caddyfile with casing
+      - caddy_data:/data
 
 networks:
   app-network:
@@ -141,7 +67,5 @@ networks:
 volumes:
   postgres_data:
     driver: local
-  caddy_data:  # Added for Caddy SSL certificates
-    driver: local
-  caddy_config:  # Added for Caddy configuration
+  caddy_data:
     driver: local

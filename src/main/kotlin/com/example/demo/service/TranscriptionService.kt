@@ -12,7 +12,7 @@ import java.io.PrintWriter
 @Service
 class TranscriptionService {
     fun transcribeAudio(wavFile: File): String {
-        val apiKey = "f4e5ae7c485385f78b03c165bb199e5dc4f08377"
+        val apiKey = "passvalidtokenhere"
         val client = OkHttpClient()
         val mediaType = "audio/wav".toMediaType()
         val requestBody = wavFile.asRequestBody(mediaType)

@@ -28,7 +28,7 @@ class CustomAuthenticationSuccessHandler : AuthenticationSuccessHandler {
             authentication.authorities.any { it.authority == "ROLE_ADMIN" } ->
                 response.sendRedirect("$frontendUrl/admin")
             else ->
-                response.sendRedirect("$frontendUrl/record")
+                response.sendRedirect("$frontendUrl/consultshistory")
         }
     }
 }

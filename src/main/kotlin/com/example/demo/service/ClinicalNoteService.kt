@@ -5,13 +5,15 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.io.File
 import java.io.IOException
 @Service
 class ClinicalNoteService {
     fun generateClinicalNotes(transcriptionText: String): String {
-        val gptApiKey = "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"
+
+        val gptApiKey = "passvalidtokenhere"
         val gptApiUrl = "https://api.openai.com/v1/chat/completions"
 
         val client = OkHttpClient()

@@ -41,10 +41,15 @@ CREATE TABLE spring_session_attributes (
 -- changeset author:yourname:3
 
 INSERT INTO users (username, password, enabled)
-VALUES ('admin', '$2a$10$pQ77LG9/tqHr4ob8.lJ09OYm.gxv0aR3rwP2XhoHyEJ1n2D8nYI4', true);
+VALUES ('admin', '$2a$12$dhNCXRXqmV.7iZYBowpvfOKDfbQaUn15zgmzS2uSxdDpVJahZKCHm', true);
+INSERT INTO users (username, password, enabled)
+VALUES ('user', '$2a$12$dhNCXRXqmV.7iZYBowpvfOKDfbQaUn15zgmzS2uSxdDpVJahZKCHm', true);
 
 INSERT INTO authorities (username, authority)
 VALUES ('admin', 'ROLE_ADMIN');
+INSERT INTO authorities (username, authority)
+VALUES ('user', 'ROLE_USER');
+
 
 -- changeset author:yourname:4
 CREATE TABLE consult_history (

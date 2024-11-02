@@ -8,7 +8,7 @@ import java.io.IOException
 import java.io.PrintWriter
 
 fun TranscribeMain() {
-    val apiKey = "f4e5ae7c485385f78b03c165bb199e5dc4f08377"
+    val apiKey = "passvalidtokenhere"
     val audioFilePath = "audio_files/7087.wav"
     val outputFilePath = "transcribed files/7087_transcription_result.txt"
 

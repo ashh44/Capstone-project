@@ -14,8 +14,8 @@ export default function Record() {
   useEffect(() => {
     checkAuth();
   }, []);
-const apiBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://54.208.12.34/api';
-  const frontendUrl = process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://54.208.12.34';
+const apiBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080/api';
+  const loginUrl = process.env.NEXT_PUBLIC_LOGIN_URL || 'http://localhost:8080';
   const checkAuth = async () => {
     try {
       const response = await fetch(`${apiBaseUrl}/check-auth`, {
@@ -27,14 +27,14 @@ const apiBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://54.208.12.34/a
         if (data.authenticated) {
           setIsAuthenticated(true);
         } else {
-          window.location.href = `${frontendUrl}/login`;
+          window.location.href = `${loginUrl}/login`;
         }
       } else {
-        window.location.href = `${frontendUrl}/login`;
+        window.location.href = `${loginUrl}/login`;
       }
     } catch (error) {
       console.error('Error checking authentication:', error);
-      window.location.href = `${frontendUrl}/login`;
+      window.location.href = `${loginUrl}/login`;
     }
   };
 
@@ -115,9 +115,9 @@ const apiBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://54.208.12.34/a
   };
 
   return (
-
-
       <div className="min-h-screen bg-blue-900 flex flex-col justify-between">
+        {isAuthenticated ? (
+          <>
             <header className="w-full flex justify-between items-center px-6 py-4">
               <img src="/facere-logo.svg" alt="Facere Logo" className="h-10" />
               <nav className="space-x-6">
@@ -129,36 +129,38 @@ const apiBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://54.208.12.34/a
                 <a href="#" className="text-white hover:underline">About Us</a>
               </nav>
             </header>
-      <main className="flex-grow flex items-center justify-center">
-        <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg text-center border-4 border-indigo-500">
-          <h1 className="text-4xl font-bold text-gray-800 mb-6">🎤 Audio Recorder</h1>
-          {error && (
-            <div className="mb-4 p-2 bg-red-100 border border-red-400 text-red-700 rounded">
-              {error}
-            </div>
-          )}
-          <button
-            onClick={handleStartStop}
-            className={`w-full py-3 mb-4 text-white font-semibold rounded-lg transition-all ${
-              isRecording ? 'bg-red-500 hover:bg-red-700' : 'bg-green-500 hover:bg-green-700'
-            }`}
-          >
-            {isRecording ? 'Stop Recording' : 'Start Recording'}
-          </button>
-          <p className="text-gray-600 mb-6">
-            {isRecording ? '🎙️ Recording in progress...' : 'Click the button to start recording'}
-          </p>
-          <button
-            onClick={handleSave}
-            disabled={audioBuffer.length === 0}
-            className={`w-full py-3 text-white font-semibold rounded-lg transition-all ${
-              audioBuffer.length === 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-500 hover:bg-indigo-700'
-            }`}
-          >
-            Save Recording
-          </button>
-        </div>
-      </main>
-    </div>
-  );
+            <main className="flex-grow flex items-center justify-center">
+              <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg text-center border-4 border-indigo-500">
+                <h1 className="text-4xl font-bold text-gray-800 mb-6">🎤 Audio Recorder</h1>
+                {error && (
+                  <div className="mb-4 p-2 bg-red-100 border border-red-400 text-red-700 rounded">
+                    {error}
+                  </div>
+                )}
+                <button
+                  onClick={handleStartStop}
+                  className={`w-full py-3 mb-4 text-white font-semibold rounded-lg transition-all ${
+                    isRecording ? 'bg-red-500 hover:bg-red-700' : 'bg-green-500 hover:bg-green-700'
+                  }`}
+                >
+                  {isRecording ? 'Stop Recording' : 'Start Recording'}
+                </button>
+                <p className="text-gray-600 mb-6">
+                  {isRecording ? '🎙️ Recording in progress...' : 'Click the button to start recording'}
+                </p>
+                <button
+                  onClick={handleSave}
+                  disabled={audioBuffer.length === 0}
+                  className={`w-full py-3 text-white font-semibold rounded-lg transition-all ${
+                    audioBuffer.length === 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-500 hover:bg-indigo-700'
+                  }`}
+                >
+                  Save Recording
+                </button>
+              </div>
+            </main>
+          </>
+        ) : null}
+      </div>
+    );
 }

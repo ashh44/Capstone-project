@@ -50,7 +50,7 @@ class SecurityConfig(private val dataSource: DataSource) {
                     .requestMatchers("/login", "/api/check-auth", "/home", "/api/**").permitAll()
                     .requestMatchers("/admin", "/api/users").hasRole("ADMIN")
                     .requestMatchers("/api/consult/**").authenticated()
-                    .requestMatchers("/deepgram-proxy").permitAll()
+                    .requestMatchers("/api/deepgram-proxy").permitAll()
                     .anyRequest().authenticated()
             }
             .formLogin { form ->

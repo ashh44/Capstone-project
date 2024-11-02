@@ -10,7 +10,7 @@ import java.io.IOException
 
 fun ClinicalMain() {
     val transcriptionFilePath = "transcribed files/7087_transcription_result.txt"
-    val gptApiKey = "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"
+    val gptApiKey = "passvalidtokenhere"
     val gptApiUrl = "https://api.openai.com/v1/chat/completions"
 
     val transcriptionText = try {

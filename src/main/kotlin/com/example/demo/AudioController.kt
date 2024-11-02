@@ -123,16 +123,18 @@ class AudioController(
             val transcriptionText = transcriptionService.transcribeAudio(wavFile)
             println("Transcription text: $transcriptionText")
             // Step 3: Generate the clinical notes (summary)
+            println("transcription text completed ")
             val summary = clinicalNoteService.generateClinicalNotes(transcriptionText)
-
+            println("clinical notes completed ")
             // Step 4: Generate the consult letter
             val consultLetter = letterService.generateConsultLetter(transcriptionText)
 
-
+            println("pre save consulthistory ")
             //  Update ConsultHistory with the summary and letter
             consultHistoryService.updateSummary(sessionId, summary)
+            println(" consulthistory update summary done")
             consultHistoryService.updateLetter(sessionId, consultLetter)
-
+            println(" consulthistory update letter done")
             ResponseEntity.ok("Summary and letter generated successfully.")
         } catch (e: Exception) {
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

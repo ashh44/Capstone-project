@@ -22,7 +22,7 @@ class WebSocketConfig : WebSocketConfigurer {
     }
 
     override fun registerWebSocketHandlers(registry: WebSocketHandlerRegistry) {
-        registry.addHandler(audioWebsocketHandler(), "/deepgram-proxy")
+        registry.addHandler(audioWebsocketHandler(), "/api/deepgram-proxy")
             .setAllowedOrigins("*")
     }
 

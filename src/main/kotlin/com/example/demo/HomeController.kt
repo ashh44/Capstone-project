@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.*
 
 @Controller
 class HomeController(
-    @Value("\${REACT_APP_FRONTEND_URL}") val frontendUrl: String
+    @Value("\${frontend.cors-origin}")
+    private var frontendUrl: String
 ) {
 
 

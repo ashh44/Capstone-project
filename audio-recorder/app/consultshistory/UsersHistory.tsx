@@ -11,7 +11,7 @@ interface HistoryRecord {
   summary: string;
   letter: string;
 }
-const apiBaseUrl = process.env.REACT_APP_BACKEND_URL;
+
 const UserHistory: React.FC = () => {
   const [history, setHistory] = useState<HistoryRecord[]>([]);
   const [error, setError] = useState<string>('');
@@ -24,7 +24,8 @@ const UserHistory: React.FC = () => {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://54.208.12.34/api';
+
+        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080';
         const response = await fetch(`${backendUrl}/api/consult/history`, {
           method: 'GET',
           headers: {
